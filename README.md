@@ -9,10 +9,10 @@ O enunciado do trabalho pode ser encontrado aqui:
 
 ## Dados do Aluno
 
-- **Nome completo:** [Preencher aqui]
-- **Matrícula:** [Preencher aqui]
-- **Curso:** [Preencher aqui]
-- **Turma:** [Preencher aqui]
+- **Nome completo:** Pedro Arthur Rodrigues Almeida
+- **Matrícula:** 241012365
+- **Curso:** Orientação a Objetos
+- **Turma:** 06
 
 ---
 
@@ -73,4 +73,5 @@ O enunciado do trabalho pode ser encontrado aqui:
 
 ## Contato
 
-- [Opcional: E-mail pessoal do aluno.]
+- **Email:** parthur.rodrigues06@gmail.com
+- **LinkedIn:** https://www.linkedin.com/in/parthurrod06
