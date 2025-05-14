@@ -8,16 +8,15 @@ public class Turma {
     private Disciplina disciplina;
     private String professor;
     private String semestre;
-    private String formaAvaliacao; // "F1" ou "F2"
+    private String formaAvaliacao;
     private boolean presencial;
     private String sala;
     private String horario;
     private int capacidade;
     private List<Aluno> alunosMatriculados;
-    
-    // MÉTODO CONSTRUTOR
+
     public Turma(Disciplina disciplina, String professor, String semestre, String formaAvaliacao, boolean presencial,
-            String sala, String horario, int capacidade) {
+                 String sala, String horario, int capacidade) {
         this.disciplina = disciplina;
         this.professor = professor;
         this.semestre = semestre;
@@ -30,45 +29,21 @@ public class Turma {
     }
 
     public boolean adicionarAluno(Aluno aluno){
-        if (alunosMatriculados.size() < capacidade){
+        String codigoDisciplina = disciplina.getCodigo();
+        List<String> preRequisitos = disciplina.getPreRequisitos();
+
+        if (alunosMatriculados.size() < capacidade &&
+            aluno.matricular(codigoDisciplina, preRequisitos)) {
+
             alunosMatriculados.add(aluno);
             return true;
         }
+
         return false;
     }
 
     public void removerAluno(Aluno aluno){
         alunosMatriculados.remove(aluno);
-    }
-
-    // GETTERS
-
-    public String getProfessor() {
-        return professor;
-    }
-
-    public String getSemestre() {
-        return semestre;
-    }
-
-    public String getFormaAvaliacao() {
-        return formaAvaliacao;
-    }
-
-    public boolean isPresencial() {
-        return presencial;
-    }
-
-    public String getSala() {
-        return sala;
-    }
-
-    public String getHorario() {
-        return horario;
-    }
-
-    public int getCapacidade() {
-        return capacidade;
     }
 
     public List<Aluno> getAlunosMatriculados() {
@@ -77,6 +52,10 @@ public class Turma {
 
     @Override
     public String toString(){
-        return "Turma de " + disciplina.getNome() + " | Professor: " + professor + " | Semestre: " + semestre + " | Horário: " + horario + " | Modalidade: " + (presencial ? "Presecial, Sala " + sala : "Remota");
+        return "Turma de " + disciplina.getNome() +
+               " | Professor: " + professor +
+               " | Semestre: " + semestre +
+               " | Horário: " + horario +
+               " | Modalidade: " + (presencial ? "Presencial (Sala " + sala + ")" : "Remota");
     }
 }

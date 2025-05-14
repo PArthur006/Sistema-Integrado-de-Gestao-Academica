@@ -1,55 +1,64 @@
 import aluno.Aluno;
 import aluno.AlunoNormal;
+import aluno.AlunoEspecial;
 import disciplina.Disciplina;
 import disciplina.Turma;
 
 public class Main {
-    public static void main(String[] args){
-        // Criando algumas disciplinas
-        Disciplina disciplina1 = new Disciplina("Matemática", "Mat101", 60);
-        Disciplina disciplina2 = new Disciplina("Física", "FIS101", 80);
-
-        //Criando turmas para as disciplinas
-        Turma turma1 = new Turma(disciplina1, "João", "2025.1", "F1", true, "101", "08:00 - 10:00", 30);
-        
-        Turma turma2 = new Turma(disciplina1, "João", "2025.1", "F2", false, "", "18:00 - 20:00", 30);
-
-        Turma turma3 = new Turma(disciplina2, "Maria", "2025.1", "F1", true, "202", "10:00 - 12:00", 25);
-
-        // Adicionando turmas às disciplinas
-        disciplina1.adicionarTurma(turma1);
-        disciplina1.adicionarTurma(turma2);
-        disciplina2.adicionarTurma(turma3);
-
+    public static void main(String[] args) {
         // Criando alunos
         Aluno aluno1 = new AlunoNormal("Pedro Silva", "123456789", "Engenharia");
-        Aluno aluno2 = new AlunoNormal("Ana Costa", "987654321", "Física");
+        Aluno aluno2 = new AlunoEspecial("Ana Costa", "987654321", "Física");
 
-        // Matriculando alunos nas turmas
-        turma1.adicionarAluno(aluno1);
-        turma3.adicionarAluno(aluno2);
+        // Simular que aluno1 já concluiu POO
+        aluno1.adicionarDisciplinaConcluida("INF101");
 
-        //Exibindo informações
-        System.out.println("---------------------------------------");
-        System.out.println("Disciplinas e suas turmas:");
-        System.out.println("---------------------------------------");
-        System.out.println(disciplina1);
-        for (Turma t : disciplina1.getTurmas()){
-            System.out.println(t);
-            System.out.println("Alunos matriculados: ");
-            for(Aluno a : t.getAlunosMatriculados()){
-                System.out.println(a.getNome());
-            }
+        // Criando disciplinas
+        Disciplina poo = new Disciplina("POO", "INF101", 60);
+        Disciplina ed = new Disciplina("Estrutura de Dados", "INF102", 60);
+        ed.adicionarPreRequisito("INF101");
+
+        // Criando turmas
+        Turma turma1 = new Turma(poo, "Prof. João", "2024.1", "simples", true, "Sala 101", "Seg 10h", 3);
+        Turma turma2 = new Turma(ed, "Prof. Maria", "2024.1", "ponderada", false, null, "Qua 14h", 2);
+
+        System.out.println("--- Tentando matricular aluno1 em POO ---");
+        if (turma1.adicionarAluno(aluno1)) {
+            System.out.println("Matrícula de " + aluno1.getNome() + " em POO realizada com sucesso.");
+        } else {
+            System.out.println("Matrícula de " + aluno1.getNome() + " em POO falhou.");
         }
-        System.out.println("---------------------------------------");
-        System.out.println(disciplina2);
-        for(Turma t : disciplina2.getTurmas()){
-            System.out.println(t);
-            System.out.println("Alunos matriculados: ");
-            for (Aluno a : t.getAlunosMatriculados()){
-                System.out.println(a.getNome());
-            }
+
+        System.out.println("\n--- Tentando matricular aluno1 em ED (com pré-requisito) ---");
+        if (turma2.adicionarAluno(aluno1)) {
+            System.out.println("Matrícula de " + aluno1.getNome() + " em ED realizada com sucesso.");
+        } else {
+            System.out.println("Matrícula de " + aluno1.getNome() + " em ED falhou.");
         }
-        System.out.println("---------------------------------------");
+
+        System.out.println("\n--- Tentando matricular aluno2 em POO ---");
+        if (turma1.adicionarAluno(aluno2)) {
+            System.out.println("Matrícula de " + aluno2.getNome() + " em POO realizada com sucesso.");
+        } else {
+            System.out.println("Matrícula de " + aluno2.getNome() + " em POO falhou.");
+        }
+
+        System.out.println("\n--- Tentando matricular aluno2 em ED (aluno especial pode cursar só 1) ---");
+        if (turma2.adicionarAluno(aluno2)) {
+            System.out.println("Matrícula de " + aluno2.getNome() + " em ED realizada com sucesso.");
+        } else {
+            System.out.println("Matrícula de " + aluno2.getNome() + " em ED falhou.");
+        }
+
+        // Mostrar alunos matriculados
+        System.out.println("\n=========== Alunos matriculados nas turmas ===========\n");
+        for (Turma turma : new Turma[]{turma1, turma2}) {
+            System.out.println(turma);
+            System.out.println("Alunos matriculados:");
+            for (Aluno a : turma.getAlunosMatriculados()) {
+                System.out.println("- " + a.getNome() + " | Matrícula: " + a.getMatricula());
+            }
+            System.out.println();
+        }
     }
 }

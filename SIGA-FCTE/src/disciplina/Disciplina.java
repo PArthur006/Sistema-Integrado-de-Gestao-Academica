@@ -10,8 +10,7 @@ public class Disciplina {
     private List<String> preRequisitos;
     private List<Turma> turmas;
 
-    // MÉTODO CONSTRUTOR
-    public Disciplina(String nome, String codigo, int cargaHoraria){
+    public Disciplina(String nome, String codigo, int cargaHoraria) {
         this.nome = nome;
         this.codigo = codigo;
         this.cargaHoraria = cargaHoraria;
@@ -19,17 +18,18 @@ public class Disciplina {
         this.turmas = new ArrayList<>();
     }
 
-    public void adicionarPreRequisito(String codigoDisciplina){
-        if(!preRequisitos.contains(codigoDisciplina)){
+    public void adicionarPreRequisito(String codigoDisciplina) {
+        if (!preRequisitos.contains(codigoDisciplina)) {
             preRequisitos.add(codigoDisciplina);
         }
     }
 
-    public void adicionarTurma(Turma turma){
-        turmas.add(turma);
+    public void adicionarTurma(Turma turma) {
+        if (!turmas.contains(turma)) {
+            turmas.add(turma);
+        }
     }
 
-    // GETTERS
     public String getNome() {
         return nome;
     }
@@ -51,7 +51,7 @@ public class Disciplina {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "Disciplina: " + nome + " | Código: " + codigo + " | Carga Horária: " + cargaHoraria;
     }
 }
