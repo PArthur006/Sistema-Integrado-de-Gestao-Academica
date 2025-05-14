@@ -1,5 +1,6 @@
 package aluno;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Aluno {
@@ -7,24 +8,24 @@ public abstract class Aluno {
     protected String matricula;
     protected String curso;
     protected List<String> disciplinasMatriculadas;
+    protected List<String> disciplinasConcluidas;
 
-    // MÉTODO CONSTRUTOR
     public Aluno(String nome, String matricula, String curso){
         this.nome = nome;
         this.matricula = matricula;
         this.curso = curso;
+        this.disciplinasMatriculadas = new ArrayList<>();
+        this.disciplinasConcluidas = new ArrayList<>();
     }
 
-    public String getMatricula(){
-        return matricula;
-    }
+    public abstract boolean podeMatricular(String codigoDisciplina, List<String> preRequisitos);
 
-    public abstract boolean podeMatricular(String disciplina);
-
-    public void matricular(String disciplina){
-        if(podeMatricular(disciplina)){
-            disciplinasMatriculadas.add(disciplina);
+    public boolean matricular(String codigoDisciplina, List<String> preRequisitos){
+        if (podeMatricular(codigoDisciplina, preRequisitos)) {
+            disciplinasMatriculadas.add(codigoDisciplina);
+            return true;
         }
+        return false;
     }
 
     public void trancarDisciplina(String disciplina){
@@ -35,31 +36,30 @@ public abstract class Aluno {
         disciplinasMatriculadas.clear();
     }
 
-    // GETTERS E SETTERS
+    public void adicionarDisciplinaConcluida(String codigoDisciplina) {
+        if (!disciplinasConcluidas.contains(codigoDisciplina)) {
+            disciplinasConcluidas.add(codigoDisciplina);
+        }
+    }
 
     public String getNome() {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
-    }
-
-    public String getCurso() {
-        return curso;
-    }
-
-    public void setCurso(String curso) {
-        this.curso = curso;
+    public String getMatricula() {
+        return matricula;
     }
 
     public List<String> getDisciplinasMatriculadas() {
         return disciplinasMatriculadas;
     }
 
-}
+    public List<String> getDisciplinasConcluidas() {
+        return disciplinasConcluidas;
+    }
 
+    @Override
+    public String toString() {
+        return nome + " | Matrícula: " + matricula;
+    }
+}
