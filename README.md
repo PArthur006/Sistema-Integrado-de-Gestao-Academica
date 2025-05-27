@@ -27,20 +27,20 @@ O enunciado do trabalho pode ser encontrado aqui:
    java -cp bin Main
 
 3.  **Estrutura de Pastas:**  
-      SIGA-FCTE/
-   ├── src/
-   │   ├── aluno/          # Classes de Aluno (Normal/Especial)
-   │   ├── disciplina/     # Disciplinas e Turmas
-   │   ├── avaliacao/      # Notas, Frequência e Relatórios
-   │   ├── menus/          # Interfaces de usuário
-   │   ├── persistencia/   # Armazenamento em arquivos
-   │   └── Main.java       # Ponto de entrada
-   ├── bin/                # Arquivos compilados
-   ├── dados/              # Arquivos .txt gerados
-   │   ├── alunos.txt
-   │   ├── disciplinas.txt
-   │   └── turmas.txt
-   └── run.sh              # Script de execução
+      SIGA-FCTE/<br>
+   ├── src/ <br>
+   │   ├── aluno/          # Classes de Aluno (Normal/Especial)<br>
+   │   ├── disciplina/     # Disciplinas e Turmas<br>
+   │   ├── avaliacao/      # Notas, Frequência e Relatórios<br>
+   │   ├── menus/          # Interfaces de usuário<br>
+   │   ├── persistencia/   # Armazenamento em arquivos<br>
+   │   └── Main.java       # Ponto de entrada<br>
+   ├── bin/                # Arquivos compilados<br>
+   ├── dados/              # Arquivos .txt gerados<br>
+      ├── alunos.txt<br>
+      ├── disciplinas.txt<br>
+      └── turmas.txt<br>
+   
 
 3. **Versão do JAVA utilizada:**  
    23.0.1
