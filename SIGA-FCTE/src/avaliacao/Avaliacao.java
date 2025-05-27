@@ -1,20 +1,34 @@
 package avaliacao;
 
+import disciplina.Turma;
+import java.util.HashMap;
+import java.util.Map;
+
 public class Avaliacao {
-    public static boolean aprovadoPorNota(double mediaFinal){
-        return mediaFinal >= 5.0;
+    private Turma turma;
+    private Map<String, Nota> notasAlunos;
+    private Map<String, Frequencia> frequenciasAlunos;
+
+    public Avaliacao(Turma turma) {
+        this.turma = turma;
+        this.notasAlunos = new HashMap<>();
+        this.frequenciasAlunos = new HashMap<>();
     }
 
-    public static String resultadoFinal(double media, double frequencia){
-        if(frequencia >= 75.0 && media >= 5.0){
-            return "Aprovado";
-        } else if(frequencia < 75.0 && media < 5.0){
-            return "Reprovado por falta e nota";
-        } else if(frequencia < 75.0){
-            return "Reprovado por falta";
-        } else {
-            return "Reprovado por nota";
+    public void lancarNota(String matricula, Nota nota) {
+        notasAlunos.put(matricula, nota);
+    }
+
+    public void lancarFrequencia(String matricula, Frequencia frequencia) {
+        frequenciasAlunos.put(matricula, frequencia);
+    }
+
+    public Boletim gerarBoletim(String matricula) {
+        Nota nota = notasAlunos.get(matricula);
+        Frequencia frequencia = frequenciasAlunos.get(matricula);
+        if (nota != null && frequencia != null) {
+            return new Boletim(turma, nota, frequencia);
         }
+        return null;
     }
 }
-// 26250509017295

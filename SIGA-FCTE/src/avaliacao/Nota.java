@@ -4,22 +4,34 @@ public class Nota {
     private double p1;
     private double p2;
     private double p3;
-    private double listas;
-    private double seminario;
+    private double l;
+    private double s;
 
-    public Nota(double p1, double p2, double p3, double listas, double seminario){
+    public Nota(double p1, double p2, double p3, double l, double s) {
         this.p1 = p1;
         this.p2 = p2;
         this.p3 = p3;
-        this.listas = listas;
-        this.seminario = seminario;
+        this.l = l;
+        this.s = s;
     }
 
-    public double calcularMediaSimples(){
-        return (p1 + p2 + p3 + listas + seminario) / 5;
+    public double getP1() {
+        return p1;
     }
 
-    public double calcularMediaPonderada(){
-        return (p1 + p2*2 + p3*3 + listas + seminario) / 8;
+    public double getP2() {
+        return p2;
+    }
+
+    public double getP3() {
+        return p3;
+    }
+
+    public double getL() {
+        return l;
+    }
+
+    public double getS() {
+        return s;
     }
 }

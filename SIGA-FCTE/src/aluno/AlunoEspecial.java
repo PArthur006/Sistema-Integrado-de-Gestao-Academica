@@ -1,6 +1,6 @@
 package aluno;
 
-import java.util.List;
+import disciplina.Disciplina;
 
 public class AlunoEspecial extends Aluno {
     public AlunoEspecial(String nome, String matricula, String curso) {
@@ -8,11 +8,12 @@ public class AlunoEspecial extends Aluno {
     }
 
     @Override
-    public boolean podeMatricular(String codigoDisciplina, List<String> preRequisitos) {
-        return disciplinasMatriculadas.size() < 1;
+    public boolean podeMatricular(Disciplina disciplina) {
+        return disciplinasMatriculadas.size() < 2;
     }
 
-    public boolean recebeNotas() {
-        return false;
+    @Override
+    public String getTipo() {
+        return "Especial";
     }
 }

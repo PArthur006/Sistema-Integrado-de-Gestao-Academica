@@ -1,6 +1,6 @@
 package aluno;
 
-import java.util.List;
+import disciplina.Disciplina;
 
 public class AlunoNormal extends Aluno {
     public AlunoNormal(String nome, String matricula, String curso) {
@@ -8,12 +8,12 @@ public class AlunoNormal extends Aluno {
     }
 
     @Override
-    public boolean podeMatricular(String codigoDisciplina, List<String> preRequisitos) {
-        return disciplinasMatriculadas.contains(codigoDisciplina) == false &&
-               disciplinasConcluidas.containsAll(preRequisitos);
+    public boolean podeMatricular(Disciplina disciplina) {
+        return true;
     }
 
-    public boolean recebeNotas() {
-        return true;
+    @Override
+    public String getTipo() {
+        return "Normal";
     }
 }

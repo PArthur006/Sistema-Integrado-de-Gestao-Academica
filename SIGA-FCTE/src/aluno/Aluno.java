@@ -1,5 +1,6 @@
 package aluno;
 
+import disciplina.Disciplina;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,59 +8,43 @@ public abstract class Aluno {
     protected String nome;
     protected String matricula;
     protected String curso;
-    protected List<String> disciplinasMatriculadas;
-    protected List<String> disciplinasConcluidas;
+    protected List<Disciplina> disciplinasMatriculadas;
 
-    public Aluno(String nome, String matricula, String curso){
+    public Aluno(String nome, String matricula, String curso) {
         this.nome = nome;
         this.matricula = matricula;
         this.curso = curso;
         this.disciplinasMatriculadas = new ArrayList<>();
-        this.disciplinasConcluidas = new ArrayList<>();
-    }
-
-    public abstract boolean podeMatricular(String codigoDisciplina, List<String> preRequisitos);
-
-    public boolean matricular(String codigoDisciplina, List<String> preRequisitos){
-        if (podeMatricular(codigoDisciplina, preRequisitos)) {
-            disciplinasMatriculadas.add(codigoDisciplina);
-            return true;
-        }
-        return false;
-    }
-
-    public void trancarDisciplina(String disciplina){
-        disciplinasMatriculadas.remove(disciplina);
-    }
-
-    public void trancarSemestre(){
-        disciplinasMatriculadas.clear();
-    }
-
-    public void adicionarDisciplinaConcluida(String codigoDisciplina) {
-        if (!disciplinasConcluidas.contains(codigoDisciplina)) {
-            disciplinasConcluidas.add(codigoDisciplina);
-        }
     }
 
     public String getNome() {
         return nome;
     }
 
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
     public String getMatricula() {
         return matricula;
     }
 
-    public List<String> getDisciplinasMatriculadas() {
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
+    }
+
+    public String getCurso() {
+        return curso;
+    }
+
+    public void setCurso(String curso) {
+        this.curso = curso;
+    }
+
+    public List<Disciplina> getDisciplinasMatriculadas() {
         return disciplinasMatriculadas;
     }
 
-    public List<String> getDisciplinasConcluidas() {
-        return disciplinasConcluidas;
-    }
-
-    @Override
-    public String toString() {
-        return nome + " | Matrícula: " + matricula;
-    }
+    public abstract boolean podeMatricular(Disciplina disciplina);
+    public abstract String getTipo();
 }

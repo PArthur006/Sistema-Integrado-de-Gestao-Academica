@@ -1,0 +1,2 @@
+Matematica Discreta;MTM2012;60
+OO;CPS2010;90
