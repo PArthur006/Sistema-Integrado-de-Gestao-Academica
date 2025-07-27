@@ -1,0 +1,29 @@
+# Arquivos de configuração e workspace do Visual Studio Code
+.vscode/
+
+# Bytecode e pastas de compilação do Java
+bin/
+*.class
+
+# Pastas de build de ferramentas comuns (Maven, Gradle)
+target/
+build/
+out/
+
+# Arquivos de Log
+*.log
+logs/
+
+# Arquivos gerados por sistemas operacionais
+.DS_Store
+Thumbs.db
+
+# Arquivos de dependências e pacotes
+node_modules/
+dist/
+
+# Arquivos compactados temporários
+*.zip
+*.tar
+*.gz
+*.rar
