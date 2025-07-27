@@ -1,0 +1,3 @@
+06;MTM2012;Cristiane;3;02;10;120;Simples
+06;MAT0112;Paula;2025.2;Anfiteatro;24M12;150;Simples
+

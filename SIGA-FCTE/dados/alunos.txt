@@ -1,2 +1,4 @@
 João da Silva;1111111	;Engenharia de Software;Normal
 Pedro Arthur;241012365;Engenharias;Normal
+Maria;241012111;Redes de Computadores;Especial
+
