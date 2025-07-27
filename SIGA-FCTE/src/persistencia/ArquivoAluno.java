@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArquivoAluno {
-    private static final String ARQUIVO = "alunos.txt";
+    private static final String ARQUIVO = "SIGA-FCTE/dados/alunos.txt";
 
     public static List<Aluno> carregarAlunos() {
         List<Aluno> alunos = new ArrayList<>();

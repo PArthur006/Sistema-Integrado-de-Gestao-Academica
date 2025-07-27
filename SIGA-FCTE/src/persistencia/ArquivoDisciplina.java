@@ -9,8 +9,8 @@ import java.util.List;
 import aluno.Aluno;
 
 public class ArquivoDisciplina {
-    private static final String ARQUIVO_DISCIPLINAS = "disciplinas.txt";
-    private static final String ARQUIVO_TURMAS = "turmas.txt";
+    private static final String ARQUIVO_DISCIPLINAS = "SIGA-FCTE/dados/disciplinas.txt";
+    private static final String ARQUIVO_TURMAS = "SIGA-FCTE/dados/turmas.txt";
 
     public static List<Disciplina> carregarDisciplinas() {
         List<Disciplina> disciplinas = new ArrayList<>();

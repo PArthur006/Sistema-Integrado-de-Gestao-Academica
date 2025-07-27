@@ -6,8 +6,8 @@ import java.io.*;
 import java.util.*;
 
 public class ArquivoAvaliacao {
-    private static final String ARQ_AVALIACOES = "SIGA-FCTE/avaliacoes.txt";
-    private static final String ARQ_FREQUENCIAS = "SIGA-FCTE/frequencias.txt";
+    private static final String ARQ_AVALIACOES = "SIGA-FCTE/dados/avaliacoes.txt";
+    private static final String ARQ_FREQUENCIAS = "SIGA-FCTE/dados/frequencias.txt";
 
     public static List<Nota> lerAvaliacoes() {
         List<Nota> avaliacoes = new ArrayList<>();

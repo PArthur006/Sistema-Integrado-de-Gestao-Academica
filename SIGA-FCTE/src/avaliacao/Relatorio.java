@@ -1,12 +1,7 @@
 package avaliacao;
 
 import disciplina.Turma;
-import disciplina.Disciplina;
-import avaliacao.Nota;
-import avaliacao.Frequencia;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Relatorio {
     // Relatório detalhado por turma
