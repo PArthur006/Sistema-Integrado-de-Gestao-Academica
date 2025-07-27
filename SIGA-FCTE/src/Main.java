@@ -1,16 +1,17 @@
-import menus.MenuPrincipal;
+import menus.TelaPrincipal;
 import persistencia.ArquivoPrincipal;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            MenuPrincipal.exibir(scanner);
-        } finally {
+        // Inicia a interface gráfica principal
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            new TelaPrincipal().setVisible(true);
+        });
+
+        // Salva tudo ao fechar o programa
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             ArquivoPrincipal.salvarTudo();
-            scanner.close();
-        }
+        }));
     }
 
     public static void clearConsole() {
