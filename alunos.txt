@@ -1,0 +1,2 @@
+João da Silva;1111111	;Engenharia de Software;Normal
+Pedro Arthur;241012365;Engenharias;Normal

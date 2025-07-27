@@ -5,6 +5,9 @@ import avaliacao.Boletim;
 import avaliacao.Frequencia;
 import avaliacao.Nota;
 import avaliacao.Relatorio;
+import persistencia.ArquivoAvaliacao;
+import aluno.Aluno;
+import aluno.AlunoEspecial;
 import disciplina.Turma;
 import java.util.List;
 import java.util.Scanner;
@@ -68,16 +71,27 @@ public class MenuAvaliacao {
         
         System.out.print("Matrícula do aluno: ");
         String matricula = scanner.nextLine();
+
+        // Impedir lançamento para AlunoEspecial acima do limite
+        Aluno aluno = turma.getAlunosMatriculados().stream().filter(a -> a.getMatricula().equals(matricula)).findFirst().orElse(null);
+        if (aluno instanceof AlunoEspecial && aluno.getDisciplinasMatriculadas().size() >= 2) {
+            System.out.println("Aluno Especial não pode receber notas em mais de 2 disciplinas!");
+            return;
+        }
         
         double p1 = lerNota(scanner, "Nota P1");
         double p2 = lerNota(scanner, "Nota P2");
         double p3 = lerNota(scanner, "Nota P3");
         double l = lerNota(scanner, "Nota L");
         double s = lerNota(scanner, "Nota S");
-        
-        Nota nota = new Nota(p1, p2, p3, l, s);
+        Nota nota = new Nota(turma.getCodigo(), matricula, new double[]{p1, p2, p3, l, s});
         avaliacao.lancarNota(matricula, nota);
-        System.out.println("Notas lançadas com sucesso!");
+        // Persistir
+        List<Nota> todasNotas = ArquivoAvaliacao.lerAvaliacoes();
+        todasNotas.removeIf(n -> n.getTurma().equals(turma.getCodigo()) && n.getAluno().equals(matricula));
+        todasNotas.add(nota);
+        ArquivoAvaliacao.salvarAvaliacoes(todasNotas);
+        System.out.println("Notas lançadas e salvas com sucesso!");
     }
 
     private static double lerNota(Scanner scanner, String mensagem) {
@@ -119,9 +133,15 @@ public class MenuAvaliacao {
         int presencas = scanner.nextInt();
         scanner.nextLine();
         
-        Frequencia frequencia = new Frequencia(totalAulas, presencas);
+        int faltas = totalAulas - presencas;
+        Frequencia frequencia = new Frequencia(turma.getCodigo(), matricula, faltas);
         avaliacao.lancarFrequencia(matricula, frequencia);
-        System.out.println("Frequência lançada com sucesso!");
+        // Persistir
+        List<Frequencia> todasFrequencias = ArquivoAvaliacao.lerFrequencias();
+        todasFrequencias.removeIf(f -> f.getTurma().equals(turma.getCodigo()) && f.getAluno().equals(matricula));
+        todasFrequencias.add(frequencia);
+        ArquivoAvaliacao.salvarFrequencias(todasFrequencias);
+        System.out.println("Frequência lançada e salva com sucesso!");
     }
 
     private static void gerarBoletim(Scanner scanner, List<Turma> turmas) {
@@ -143,19 +163,25 @@ public class MenuAvaliacao {
 
     private static void gerarRelatorio(Scanner scanner, List<Turma> turmas) {
         System.out.println("1. Por Turma");
-        System.out.println("2. Por Professor");
+        System.out.println("2. Por Disciplina");
+        System.out.println("3. Por Professor");
         System.out.print("Escolha uma opção: ");
         int opcao = scanner.nextInt();
         scanner.nextLine();
-        
+        List<Nota> notas = ArquivoAvaliacao.lerAvaliacoes();
+        List<Frequencia> frequencias = ArquivoAvaliacao.lerFrequencias();
         if (opcao == 1) {
             System.out.print("Código da turma: ");
             String codigoTurma = scanner.nextLine();
             turmas.stream()
                 .filter(t -> t.getCodigo().equals(codigoTurma))
                 .findFirst()
-                .ifPresent(Relatorio::gerarPorTurma);
+                .ifPresent(t -> Relatorio.gerarPorTurma(t, notas, frequencias));
         } else if (opcao == 2) {
+            System.out.print("Código da disciplina: ");
+            String codDisc = scanner.nextLine();
+            Relatorio.gerarPorDisciplina(turmas, codDisc);
+        } else if (opcao == 3) {
             System.out.print("Nome do professor: ");
             String professor = scanner.nextLine();
             Relatorio.gerarPorProfessor(turmas, professor);
