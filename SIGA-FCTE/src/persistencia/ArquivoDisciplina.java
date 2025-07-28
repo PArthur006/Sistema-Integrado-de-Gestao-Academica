@@ -71,9 +71,16 @@ public class ArquivoDisciplina {
         return turmas;
     }
 
-    public static void salvarDisciplinas(List<Disciplina> disciplinas) {
+    public static void salvarDisciplinas(List<Disciplina> novasDisciplinas) {
+        List<Disciplina> antigas = carregarDisciplinas();
+        for (Disciplina nova : novasDisciplinas) {
+            boolean existe = antigas.stream().anyMatch(d -> d.getCodigo().equals(nova.getCodigo()));
+            if (!existe) {
+                antigas.add(nova);
+            }
+        }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARQUIVO_DISCIPLINAS))) {
-            for (Disciplina disciplina : disciplinas) {
+            for (Disciplina disciplina : antigas) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(disciplina.getNome()).append(";");
                 sb.append(disciplina.getCodigo()).append(";");

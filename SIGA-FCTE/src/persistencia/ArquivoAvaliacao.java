@@ -27,10 +27,17 @@ public class ArquivoAvaliacao {
         return avaliacoes;
     }
 
-    public static void salvarAvaliacoes(List<Nota> avaliacoes) {
+    public static void salvarAvaliacoes(List<Nota> novasAvaliacoes) {
+        List<Nota> antigas = lerAvaliacoes();
+        for (Nota nova : novasAvaliacoes) {
+            boolean existe = antigas.stream().anyMatch(a -> a.getTurma().equals(nova.getTurma()) && a.getAluno().equals(nova.getAluno()));
+            if (!existe) {
+                antigas.add(nova);
+            }
+        }
         try (PrintWriter pw = new PrintWriter(new FileWriter(ARQ_AVALIACOES))) {
             pw.println("# turma;aluno;nota1,nota2,...");
-            for (Nota n : avaliacoes) {
+            for (Nota n : antigas) {
                 pw.print(n.getTurma() + ";" + n.getAluno() + ";");
                 double[] notas = n.getNotas();
                 for (int i = 0; i < notas.length; i++) {
@@ -59,10 +66,17 @@ public class ArquivoAvaliacao {
         return frequencias;
     }
 
-    public static void salvarFrequencias(List<Frequencia> frequencias) {
+    public static void salvarFrequencias(List<Frequencia> novasFrequencias) {
+        List<Frequencia> antigas = lerFrequencias();
+        for (Frequencia nova : novasFrequencias) {
+            boolean existe = antigas.stream().anyMatch(f -> f.getTurma().equals(nova.getTurma()) && f.getAluno().equals(nova.getAluno()));
+            if (!existe) {
+                antigas.add(nova);
+            }
+        }
         try (PrintWriter pw = new PrintWriter(new FileWriter(ARQ_FREQUENCIAS))) {
             pw.println("# turma;aluno;faltas");
-            for (Frequencia f : frequencias) {
+            for (Frequencia f : antigas) {
                 pw.println(f.getTurma() + ";" + f.getAluno() + ";" + f.getFaltas());
             }
         } catch (IOException e) { e.printStackTrace(); }

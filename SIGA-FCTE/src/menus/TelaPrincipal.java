@@ -79,7 +79,10 @@ public class TelaPrincipal extends JFrame {
         gbc.gridy = 3; painelCentral.add(btnSair, gbc);
 
         // Ações dos botões para trocar os painéis
-        btnAlunos.addActionListener(e -> trocarPainel(criarPainelDeMenu("Menu de Alunos")));
+        btnAlunos.addActionListener(e -> {
+            JPanel painelAluno = new PainelAluno(() -> trocarPainel(criarPainelPrincipal()));
+            trocarPainel(painelAluno);
+        });
         btnDisciplinas.addActionListener(e -> trocarPainel(criarPainelDeMenu("Menu de Disciplinas")));
         btnAvaliacoes.addActionListener(e -> trocarPainel(criarPainelDeMenu("Menu de Avaliações")));
         btnSair.addActionListener(e -> System.exit(0));

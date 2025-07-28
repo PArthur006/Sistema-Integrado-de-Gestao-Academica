@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArquivoAluno {
-    private static final String ARQUIVO = "SIGA-FCTE/dados/alunos.txt";
+    private static final String ARQUIVO = "dados/alunos.txt";
 
     public static List<Aluno> carregarAlunos() {
         List<Aluno> alunos = new ArrayList<>();
@@ -33,9 +33,10 @@ public class ArquivoAluno {
         return alunos;
     }
 
-    public static void salvarAlunos(List<Aluno> alunos) {
+    public static void salvarAlunos(List<Aluno> listaAtual) {
+        // Salva apenas os alunos presentes na lista atual (permitindo exclusão real)
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARQUIVO))) {
-            for (Aluno aluno : alunos) {
+            for (Aluno aluno : listaAtual) {
                 bw.write(aluno.getNome() + ";" + aluno.getMatricula() + ";" + aluno.getCurso() + ";" + aluno.getTipo());
                 bw.newLine();
             }

@@ -1,4 +1,4 @@
-João da Silva;1111111	;Engenharia de Software;Normal
-Pedro Arthur;241012365;Engenharias;Normal
-Maria;241012111;Redes de Computadores;Especial
-
+Pedro Arthur Rodrigues;241012365;Engenharias;Normal
+Marcelly Clelia;252210365;Letras-Espanhol;Normal
+Maria Júlia;361012365;Fisioterapia;Normal
+Matheus Freire;123456789;Veterinaria;Normal
