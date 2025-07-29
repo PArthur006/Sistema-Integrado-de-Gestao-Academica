@@ -1,12 +1,11 @@
 package persistencia;
 
-import menus.MenuAluno;
-import menus.MenuDisciplina;
+
+
 
 public class ArquivoPrincipal {
     public static void salvarTudo() {
-        ArquivoAluno.salvarAlunos(MenuAluno.getAlunos());
-        ArquivoDisciplina.salvarDisciplinas(MenuDisciplina.getDisciplinas());
-        ArquivoDisciplina.salvarTurmas(MenuDisciplina.getTurmas());
+        ArquivoAluno.salvarAlunos(AlunoRepository.getInstance().getAlunos());
+        // Salvamento de disciplinas e turmas é feito pela interface gráfica
     }
 }

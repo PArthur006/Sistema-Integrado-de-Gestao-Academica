@@ -101,4 +101,12 @@ public class Turma {
     public void setCapacidade(int capacidade) {
         this.capacidade = capacidade;
     }
+
+    public void setSemestre(String semestre) {
+        this.semestre = semestre;
+    }
+
+    public void setTipoAvaliacao(String tipoAvaliacao) {
+        this.tipoAvaliacao = tipoAvaliacao;
+    }
 }

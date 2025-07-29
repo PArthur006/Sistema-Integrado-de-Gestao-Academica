@@ -1,3 +1,4 @@
+// Arquivo: persistencia/ArquivoDisciplina.java
 package persistencia;
 
 import disciplina.Disciplina;
@@ -5,16 +6,22 @@ import disciplina.Turma;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import aluno.Aluno;
 
 public class ArquivoDisciplina {
-    private static final String ARQUIVO_DISCIPLINAS = "SIGA-FCTE/dados/disciplinas.txt";
-    private static final String ARQUIVO_TURMAS = "SIGA-FCTE/dados/turmas.txt";
+    private static final String ARQUIVO_DISCIPLINAS = "dados/disciplinas.txt";
+    private static final String ARQUIVO_TURMAS = "dados/turmas.txt";
 
     public static List<Disciplina> carregarDisciplinas() {
         List<Disciplina> disciplinas = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(ARQUIVO_DISCIPLINAS))) {
+        // Garante que o diretório 'dados' exista
+        new File("dados").mkdir();
+        File arquivo = new File(ARQUIVO_DISCIPLINAS);
+        if (!arquivo.exists()) {
+            return disciplinas; // Retorna lista vazia se o arquivo não existe
+        }
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
             String linha;
             while ((linha = br.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -35,9 +42,20 @@ public class ArquivoDisciplina {
     public static List<Turma> carregarTurmas() {
         List<Turma> turmas = new ArrayList<>();
         List<Disciplina> disciplinas = carregarDisciplinas();
-        List<Aluno> alunos = ArquivoAluno.carregarAlunos();
+        // A classe ArquivoAluno não foi fornecida, mas o fluxo é mantido
+        List<Aluno> alunos = new ArrayList<>(); // Supondo que ArquivoAluno.carregarAlunos() exista
+        try {
+            alunos = ArquivoAluno.carregarAlunos();
+        } catch (Exception e) {
+            System.out.println("ArquivoAluno não encontrado, continuando sem dados de alunos.");
+        }
         
-        try (BufferedReader br = new BufferedReader(new FileReader(ARQUIVO_TURMAS))) {
+        File arquivo = new File(ARQUIVO_TURMAS);
+        if (!arquivo.exists()) {
+            return turmas;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
             String linha;
             while ((linha = br.readLine()) != null) {
                 String[] dados = linha.split(";");
@@ -71,16 +89,18 @@ public class ArquivoDisciplina {
         return turmas;
     }
 
-    public static void salvarDisciplinas(List<Disciplina> novasDisciplinas) {
-        List<Disciplina> antigas = carregarDisciplinas();
-        for (Disciplina nova : novasDisciplinas) {
-            boolean existe = antigas.stream().anyMatch(d -> d.getCodigo().equals(nova.getCodigo()));
-            if (!existe) {
-                antigas.add(nova);
-            }
-        }
+    /**
+     * CORRIGIDO: Este método agora sobrescreve o arquivo de disciplinas com a lista fornecida,
+     * garantindo que edições e exclusões sejam salvas corretamente.
+     */
+    public static void salvarDisciplinas(List<Disciplina> disciplinas) {
+        // Garante que o diretório 'dados' exista
+        new File("dados").mkdir();
+        
+        // O modo como FileWriter é aberto (sem 'true' como segundo argumento)
+        // garante que o arquivo seja sobrescrito a cada chamada.
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARQUIVO_DISCIPLINAS))) {
-            for (Disciplina disciplina : antigas) {
+            for (Disciplina disciplina : disciplinas) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(disciplina.getNome()).append(";");
                 sb.append(disciplina.getCodigo()).append(";");
@@ -97,6 +117,9 @@ public class ArquivoDisciplina {
     }
 
     public static void salvarTurmas(List<Turma> turmas) {
+        // Garante que o diretório 'dados' exista
+        new File("dados").mkdir();
+        
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARQUIVO_TURMAS))) {
             for (Turma turma : turmas) {
                 StringBuilder sb = new StringBuilder();

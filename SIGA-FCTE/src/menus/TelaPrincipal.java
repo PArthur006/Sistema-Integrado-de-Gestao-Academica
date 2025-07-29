@@ -83,8 +83,14 @@ public class TelaPrincipal extends JFrame {
             JPanel painelAluno = new PainelAluno(() -> trocarPainel(criarPainelPrincipal()));
             trocarPainel(painelAluno);
         });
-        btnDisciplinas.addActionListener(e -> trocarPainel(criarPainelDeMenu("Menu de Disciplinas")));
-        btnAvaliacoes.addActionListener(e -> trocarPainel(criarPainelDeMenu("Menu de Avaliações")));
+        btnDisciplinas.addActionListener(e -> {
+            JPanel painelDisciplina = new PainelDisciplina(() -> trocarPainel(criarPainelPrincipal()));
+            trocarPainel(painelDisciplina);
+        });
+        btnAvaliacoes.addActionListener(e -> {
+            JPanel painelAvaliacao = new PainelAvaliacao(() -> trocarPainel(criarPainelPrincipal()));
+            trocarPainel(painelAvaliacao);
+        });
         btnSair.addActionListener(e -> System.exit(0));
 
         painelPrincipal.add(painelCentral, BorderLayout.CENTER);
