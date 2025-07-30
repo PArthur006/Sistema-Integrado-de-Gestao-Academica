@@ -2,3 +2,4 @@ Pedro Arthur Rodrigues;241012365;Engenharias;Normal
 Marcelly Clelia;252210365;Letras-Espanhol;Normal
 Maria Júlia;361012365;Fisioterapia;Normal
 Matheus Freire;123456789;Veterinaria;Normal
+João Guilherme;254101258;Engenharia de Energia;Normal

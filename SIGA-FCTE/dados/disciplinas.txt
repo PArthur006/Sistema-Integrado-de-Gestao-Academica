@@ -1,4 +1,4 @@
-Matematica Discreta;MTM2012;60
-OO;CPS2010;90
-Humanidade e Cidadania;MAT0112;60
-
+Matematica Discreta;MTM0112;60
+Orientação a Objetos;TEC2100;90
+Desenvolvimento de Software;TEC9877;90
+Guardiões da Saúde;SSA6544;30
