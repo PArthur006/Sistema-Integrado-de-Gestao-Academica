@@ -1,8 +1,8 @@
-package menus;
+package ui;
 
 import disciplina.Disciplina;
 import disciplina.Turma;
-import persistencia.ArquivoDisciplina;
+import persistencia.*;
 import aluno.Aluno;
 
 import javax.swing.*;
@@ -30,9 +30,8 @@ public class PainelDisciplina extends JPanel {
         setLayout(new BorderLayout());
         setBackground(BRANCO);
 
-        disciplinas = ArquivoDisciplina.carregarDisciplinas();
+        disciplinas = DisciplinaRepository.getInstance().getDisciplinas();
 
-        // Navbar
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         navbar.setBackground(AZUL_ESCURO_1);
         JButton btnCadastrar = criarBotao("Cadastrar Disciplina", VERDE_1, Color.WHITE);
@@ -47,28 +46,23 @@ public class PainelDisciplina extends JPanel {
         navbar.add(btnVoltar);
         add(navbar, BorderLayout.NORTH);
 
-        // Busca
         campoBusca = new JTextField();
         campoBusca.setFont(new Font("SansSerif", Font.PLAIN, 16));
         campoBusca.setToolTipText("Buscar por nome ou código");
-        campoBusca.setPreferredSize(new Dimension(200, 30));
 
         JPanel painelCentro = new JPanel(new BorderLayout());
         painelCentro.setBackground(BRANCO);
         painelCentro.add(campoBusca, BorderLayout.NORTH);
 
-        // Tabela
         tableModel = new DisciplinaTableModel(disciplinas);
         tabelaDisciplinas = new JTable(tableModel);
         tabelaDisciplinas.setFont(new Font("SansSerif", Font.PLAIN, 16));
         tabelaDisciplinas.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 16));
         tabelaDisciplinas.setRowHeight(28);
         JScrollPane scroll = new JScrollPane(tabelaDisciplinas);
-        scroll.setPreferredSize(new Dimension(500, 250));
         painelCentro.add(scroll, BorderLayout.CENTER);
         add(painelCentro, BorderLayout.CENTER);
 
-        // Filtro dinâmico
         campoBusca.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrar(); }
             public void removeUpdate(javax.swing.event.DocumentEvent e) { filtrar(); }
@@ -79,7 +73,6 @@ public class PainelDisciplina extends JPanel {
             }
         });
 
-        // Ações
         btnCadastrar.addActionListener(e -> cadastrarDisciplina());
         btnEditar.addActionListener(e -> editarDisciplina());
         btnExcluir.addActionListener(e -> excluirDisciplina());
@@ -114,7 +107,6 @@ public class PainelDisciplina extends JPanel {
                 return;
             }
 
-            // Validação de código duplicado
             if (disciplinas.stream().anyMatch(d -> d.getCodigo().equalsIgnoreCase(codigo))) {
                 JOptionPane.showMessageDialog(this, "O código de disciplina '" + codigo + "' já existe. Por favor, escolha outro.", "Código Duplicado", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -157,7 +149,6 @@ public class PainelDisciplina extends JPanel {
                     JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-                // Atualiza na lista principal
                 for (Disciplina disc : disciplinas) {
                     if (disc.getCodigo().equals(d.getCodigo())) {
                         disc.setNome(nome);
@@ -165,7 +156,7 @@ public class PainelDisciplina extends JPanel {
                         break;
                     }
                 }
-                tableModel.setFiltro(""); // Atualiza lista filtrada
+                tableModel.setFiltro("");
                 ArquivoDisciplina.salvarDisciplinas(disciplinas);
                 tableModel.fireTableDataChanged();
                 JOptionPane.showMessageDialog(this, "Disciplina editada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -183,19 +174,14 @@ public class PainelDisciplina extends JPanel {
                 Disciplina disciplinaParaExcluir = tableModel.getDisciplina(idx);
                 String codigoDisciplina = disciplinaParaExcluir.getCodigo();
 
-                // Exclusão em cascata: remove as turmas associadas
-                List<Turma> todasAsTurmas = ArquivoDisciplina.carregarTurmas();
-                List<Turma> turmasParaManter = todasAsTurmas.stream()
-                    .filter(t -> !t.getDisciplina().getCodigo().equals(codigoDisciplina))
-                    .collect(Collectors.toList());
-                ArquivoDisciplina.salvarTurmas(turmasParaManter);
+                List<Turma> todasAsTurmas = TurmaRepository.getInstance().getTurmas();
+                todasAsTurmas.removeIf(t -> t.getDisciplina().getCodigo().equals(codigoDisciplina));
+                ArquivoDisciplina.salvarTurmas(todasAsTurmas);
 
-                // Remove a disciplina da lista principal
                 disciplinas.removeIf(disc -> disc.getCodigo().equals(codigoDisciplina));
-
-                // Atualiza a interface
-                tableModel.setFiltro(""); // Atualiza lista filtrada
                 ArquivoDisciplina.salvarDisciplinas(disciplinas);
+
+                tableModel.setFiltro("");
                 tableModel.fireTableDataChanged();
                 JOptionPane.showMessageDialog(this, "Disciplina e suas turmas foram excluídas com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -207,13 +193,11 @@ public class PainelDisciplina extends JPanel {
     private void gerenciarTurmas() {
         int idx = tabelaDisciplinas.getSelectedRow();
         if (idx >= 0) {
-            // Captura a referência do frame ANTES de qualquer troca de painel
             JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            if (frame == null) return; // Medida de segurança
+            if (frame == null) return;
 
             Disciplina d = tableModel.getDisciplina(idx);
             PainelTurmas painelTurmas = new PainelTurmas(d, () -> {
-                // Usa a referência do frame capturada anteriormente
                 frame.setContentPane(this);
                 frame.revalidate();
                 frame.repaint();
@@ -237,7 +221,6 @@ public class PainelDisciplina extends JPanel {
         return botao;
     }
 
-    // Modelo de tabela para disciplinas
     private static class DisciplinaTableModel extends AbstractTableModel {
         private final String[] colunas = {"Nome", "Código", "Carga Horária"};
         private List<Disciplina> disciplinas;

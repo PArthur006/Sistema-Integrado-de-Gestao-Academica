@@ -1,9 +1,10 @@
-package menus;
+package ui;
 
 import disciplina.Disciplina;
 import disciplina.Turma;
-import persistencia.AlunoRepository;
 import persistencia.ArquivoDisciplina;
+import persistencia.AlunoRepository;
+import persistencia.TurmaRepository;
 import aluno.Aluno;
 
 
@@ -32,12 +33,10 @@ public class PainelTurmas extends JPanel {
         setLayout(new BorderLayout());
         setBackground(BRANCO);
 
-        // Carregar turmas da disciplina
-        turmas = ArquivoDisciplina.carregarTurmas().stream()
+        turmas = TurmaRepository.getInstance().getTurmas().stream()
             .filter(t -> t.getDisciplina().getCodigo().equals(disciplina.getCodigo()))
             .collect(Collectors.toList());
 
-        // Navbar
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         navbar.setBackground(AZUL_ESCURO_1);
         JButton btnCadastrar = criarBotao("Cadastrar Turma", VERDE_1, Color.WHITE);
@@ -54,17 +53,14 @@ public class PainelTurmas extends JPanel {
         navbar.add(btnVoltar);
         add(navbar, BorderLayout.NORTH);
 
-        // Tabela
         tableModel = new TurmaTableModel(turmas);
         tabelaTurmas = new JTable(tableModel);
         tabelaTurmas.setFont(new Font("SansSerif", Font.PLAIN, 16));
         tabelaTurmas.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 16));
         tabelaTurmas.setRowHeight(28);
         JScrollPane scroll = new JScrollPane(tabelaTurmas);
-        scroll.setPreferredSize(new Dimension(600, 250));
         add(scroll, BorderLayout.CENTER);
 
-        // Ações
         btnCadastrar.addActionListener(e -> cadastrarTurma());
         btnEditar.addActionListener(e -> editarTurma());
         btnExcluir.addActionListener(e -> excluirTurma());
@@ -113,15 +109,14 @@ public class PainelTurmas extends JPanel {
         );
 
         if (alunoSelecionadoStr == null) {
-            return; // Usuário cancelou
+            return;
         }
 
-        // Encontra o aluno correspondente na lista de disponíveis
         int selectedIndex = java.util.Arrays.asList(opcoesAlunos).indexOf(alunoSelecionadoStr);
         Aluno alunoParaMatricular = alunosDisponiveis.get(selectedIndex);
 
         if (turmaSelecionada.matricularAluno(alunoParaMatricular)) {
-            salvarTurmasGlobal();
+            ArquivoDisciplina.salvarTurmas(TurmaRepository.getInstance().getTurmas());
             tableModel.fireTableDataChanged();
             JOptionPane.showMessageDialog(this, "Aluno matriculado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
         } else {
@@ -144,7 +139,6 @@ public class PainelTurmas extends JPanel {
             return;
         }
 
-        // Cria um JDialog customizado para exibir os alunos
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Alunos da Turma " + turma.getCodigo(), true);
         dialog.setSize(400, 300);
         dialog.setLocationRelativeTo(this);
@@ -162,7 +156,7 @@ public class PainelTurmas extends JPanel {
                 int confirm = JOptionPane.showConfirmDialog(dialog, "Desmatricular " + aluno.getNome() + "?", "Confirmar", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     turma.desmatricularAluno(aluno.getMatricula());
-                    salvarTurmasGlobal();
+                    ArquivoDisciplina.salvarTurmas(TurmaRepository.getInstance().getTurmas());
                     tableModel.fireTableDataChanged(); // Atualiza a contagem de vagas na tabela principal
 
                     // Remove a linha da interface do dialog
@@ -230,15 +224,15 @@ public class PainelTurmas extends JPanel {
             }
 
             // Validação de código duplicado
-            List<Turma> todasAsTurmas = ArquivoDisciplina.carregarTurmas();
-            if (todasAsTurmas.stream().anyMatch(t -> t.getCodigo().equalsIgnoreCase(codigo))) {
+            if (TurmaRepository.getInstance().getTurmas().stream().anyMatch(t -> t.getCodigo().equalsIgnoreCase(codigo))) {
                 JOptionPane.showMessageDialog(this, "O código de turma '" + codigo + "' já existe. Por favor, escolha outro.", "Código Duplicado", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             Turma nova = new Turma(codigo, disciplina, professor, semestre, sala, horario, capacidade, tipoAvaliacao);
-            turmas.add(nova);
-            salvarTurmasGlobal();
+            TurmaRepository.getInstance().getTurmas().add(nova); // Adiciona na lista global
+            turmas.add(nova); // Adiciona na lista local para exibição
+            ArquivoDisciplina.salvarTurmas(TurmaRepository.getInstance().getTurmas());
             tableModel.fireTableDataChanged();
             JOptionPane.showMessageDialog(this, "Turma cadastrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -291,7 +285,7 @@ public class PainelTurmas extends JPanel {
                 t.setHorario(horario);
                 t.setCapacidade(capacidade);
                 t.setTipoAvaliacao(tipoAvaliacao);
-                salvarTurmasGlobal();
+                ArquivoDisciplina.salvarTurmas(TurmaRepository.getInstance().getTurmas());
                 tableModel.fireTableDataChanged();
                 JOptionPane.showMessageDialog(this, "Turma editada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -305,24 +299,16 @@ public class PainelTurmas extends JPanel {
         if (idx >= 0) {
             int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja excluir a turma selecionada?", "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                turmas.remove(tableModel.getTurma(idx));
-                salvarTurmasGlobal();
+                Turma turmaParaRemover = tableModel.getTurma(idx);
+                turmas.remove(turmaParaRemover); // Remove da lista local
+                TurmaRepository.getInstance().getTurmas().remove(turmaParaRemover); // Remove da lista global
+                ArquivoDisciplina.salvarTurmas(TurmaRepository.getInstance().getTurmas());
                 tableModel.fireTableDataChanged();
                 JOptionPane.showMessageDialog(this, "Turma excluída com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Selecione uma turma para excluir.", "Atenção", JOptionPane.WARNING_MESSAGE);
         }
-    }
-
-    // Salva todas as turmas do sistema, não só da disciplina atual
-    private void salvarTurmasGlobal() {
-        List<Turma> todas = ArquivoDisciplina.carregarTurmas();
-        // Remove todas as turmas desta disciplina
-        todas = todas.stream().filter(t -> !t.getDisciplina().getCodigo().equals(disciplina.getCodigo())).collect(Collectors.toList());
-        // Adiciona as turmas atuais da disciplina
-        todas.addAll(turmas);
-        ArquivoDisciplina.salvarTurmas(todas);
     }
 
     private JButton criarBotao(String texto, Color corFundo, Color corTexto) {

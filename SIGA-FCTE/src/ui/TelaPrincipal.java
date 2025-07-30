@@ -1,6 +1,7 @@
-package menus;
+package ui;
 
 import javax.swing.*;
+
 import java.awt.*;
 
 public class TelaPrincipal extends JFrame {
@@ -18,35 +19,6 @@ public class TelaPrincipal extends JFrame {
         setSize(900, 600);
         setLocationRelativeTo(null);
         setContentPane(criarPainelPrincipal());
-    }
-
-    private JPanel criarPainelDeMenu(String tituloDoMenu) {
-        JPanel painel = new JPanel(new BorderLayout());
-        painel.setBackground(BRANCO);
-
-        // Navbar (painel superior)
-        JPanel navbar = new JPanel();
-        navbar.setBackground(AZUL_ESCURO_1);
-        navbar.setPreferredSize(new Dimension(600, 40));
-        painel.add(navbar, BorderLayout.NORTH);
-
-        // Título central
-        JLabel titulo = new JLabel(tituloDoMenu);
-        titulo.setForeground(AZUL_ESCURO_2);
-        titulo.setFont(new Font("SansSerif", Font.BOLD, 24));
-        titulo.setHorizontalAlignment(SwingConstants.CENTER); 
-        painel.add(titulo, BorderLayout.CENTER);
-
-        // Rodapé com botão de voltar
-        JButton btnVoltar = criarBotao("Voltar", VERDE_1, BRANCO);
-        btnVoltar.addActionListener(e -> trocarPainel(criarPainelPrincipal()));
-
-        JPanel rodape = new JPanel();
-        rodape.setBackground(BRANCO);
-        rodape.add(btnVoltar);
-        painel.add(rodape, BorderLayout.SOUTH);
-
-        return painel;
     }
 
     private JPanel criarPainelPrincipal() {

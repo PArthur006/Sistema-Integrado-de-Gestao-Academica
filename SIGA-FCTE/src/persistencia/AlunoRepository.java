@@ -1,6 +1,7 @@
 package persistencia;
 
 import aluno.Aluno;
+import disciplina.Turma;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -28,8 +29,18 @@ public class AlunoRepository {
         ArquivoAluno.salvarAlunos(alunos);
     }
 
-    public void removerAluno(int idx) {
-        alunos.remove(idx);
+    public void removerAluno(String matricula) {
+        // Exclusão em cascata: remove o aluno de todas as turmas primeiro.
+        List<Turma> todasAsTurmas = TurmaRepository.getInstance().getTurmas();
+        for (Turma turma : todasAsTurmas) {
+            turma.desmatricularAluno(matricula);
+        }
+
+        // Agora, remove o aluno do repositório principal.
+        alunos.removeIf(aluno -> aluno.getMatricula().equals(matricula));
+
+        // Salva as alterações nos dois arquivos para manter a consistência.
         ArquivoAluno.salvarAlunos(alunos);
+        ArquivoDisciplina.salvarTurmas(todasAsTurmas);
     }
 }

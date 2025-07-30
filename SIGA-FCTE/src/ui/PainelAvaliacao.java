@@ -1,4 +1,4 @@
-package menus;
+package ui;
 
 import aluno.Aluno;
 import aluno.AlunoEspecial;
@@ -8,7 +8,7 @@ import avaliacao.Nota;
 import avaliacao.Relatorio;
 import disciplina.Turma;
 import persistencia.ArquivoAvaliacao;
-import persistencia.ArquivoDisciplina;
+import persistencia.TurmaRepository;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,11 +28,10 @@ public class PainelAvaliacao extends JPanel {
 
     public PainelAvaliacao(Runnable acaoVoltar) {
         this.acaoVoltar = acaoVoltar;
-        this.turmas = ArquivoDisciplina.carregarTurmas(); // Carrega as turmas
+        this.turmas = TurmaRepository.getInstance().getTurmas();
         setLayout(new BorderLayout());
         setBackground(BRANCO);
 
-        // Navbar
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         navbar.setBackground(AZUL_ESCURO_1);
         JButton btnLancarNotas = criarBotao("Lançar Notas", VERDE_1, Color.WHITE);
@@ -47,14 +46,12 @@ public class PainelAvaliacao extends JPanel {
         navbar.add(btnVoltar);
         add(navbar, BorderLayout.NORTH);
 
-        // Ações
         btnLancarNotas.addActionListener(e -> lancarNotas());
         btnLancarFrequencia.addActionListener(e -> lancarFrequencias());
         btnGerarBoletim.addActionListener(e -> gerarBoletim());
         btnGerarRelatorio.addActionListener(e -> gerarRelatorio());
         btnVoltar.addActionListener(e -> acaoVoltar.run());
 
-        // Painel central informativo
         JLabel info = new JLabel("Selecione uma opção no menu superior.", SwingConstants.CENTER);
         info.setFont(new Font("SansSerif", Font.ITALIC, 18));
         add(info, BorderLayout.CENTER);
@@ -110,7 +107,6 @@ public class PainelAvaliacao extends JPanel {
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Nota inválida. Por favor, insira um número.", "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (NullPointerException e) {
-            // Usuário cancelou o input
         }
     }
 
@@ -142,7 +138,6 @@ public class PainelAvaliacao extends JPanel {
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Valor inválido. Por favor, insira um número inteiro.", "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (NullPointerException e) {
-            // Usuário cancelou o input
         }
     }
 
@@ -187,10 +182,9 @@ public class PainelAvaliacao extends JPanel {
         );
 
         if (escolha == null) {
-            return; // Usuário cancelou
+            return;
         }
 
-        // A lógica para cada tipo de relatório será adicionada nos próximos passos.
         if ("Por Turma".equals(escolha)) {
             gerarRelatorioPorTurma();
         } else if ("Por Disciplina".equals(escolha)) {

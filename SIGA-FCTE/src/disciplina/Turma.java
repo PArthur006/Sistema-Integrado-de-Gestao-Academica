@@ -42,6 +42,11 @@ public class Turma {
         return false;
     }
 
+    public void desmatricularAluno(String matricula) {
+        alunosMatriculados.stream().filter(a -> a.getMatricula().equals(matricula)).findFirst().ifPresent(aluno -> aluno.getDisciplinasMatriculadas().remove(this.disciplina));
+        alunosMatriculados.removeIf(aluno -> aluno.getMatricula().equals(matricula));
+    }
+
     public String getCodigo() {
         return codigo;
     }

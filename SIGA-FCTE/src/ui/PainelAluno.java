@@ -1,5 +1,5 @@
 
-package menus;
+package ui;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -27,11 +27,9 @@ public class PainelAluno extends JPanel {
         setLayout(new BorderLayout());
         setBackground(BRANCO);
 
-        // Usar repositório centralizado
         repo = AlunoRepository.getInstance();
         alunos = repo.getAlunos();
 
-        // Navbar com botões visíveis
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         navbar.setBackground(AZUL_ESCURO_1);
         JButton btnCadastrar = criarBotao("Cadastrar Aluno", VERDE_1, Color.WHITE);
@@ -44,7 +42,6 @@ public class PainelAluno extends JPanel {
         navbar.add(btnVoltar);
         add(navbar, BorderLayout.NORTH);
 
-        // Campo de busca
         JPanel painelCentro = new JPanel(new BorderLayout());
         painelCentro.setBackground(BRANCO);
         JTextField campoBusca = new JTextField();
@@ -52,18 +49,15 @@ public class PainelAluno extends JPanel {
         campoBusca.setToolTipText("Buscar por nome, matrícula ou curso");
         painelCentro.add(campoBusca, BorderLayout.NORTH);
 
-        // Tabela de alunos
         tableModel = new AlunoTableModel(alunos);
         tabelaAlunos = new JTable((TableModel) tableModel);
         tabelaAlunos.setFont(new Font("SansSerif", Font.PLAIN, 16));
         tabelaAlunos.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 16));
         tabelaAlunos.setRowHeight(28);
         JScrollPane scroll = new JScrollPane(tabelaAlunos);
-        scroll.setPreferredSize(new Dimension(500, 250));
         painelCentro.add(scroll, BorderLayout.CENTER);
         add(painelCentro, BorderLayout.CENTER);
 
-        // Filtro dinâmico
         campoBusca.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void insertUpdate(javax.swing.event.DocumentEvent e) { filtrar(); }
             public void removeUpdate(javax.swing.event.DocumentEvent e) { filtrar(); }
@@ -74,7 +68,6 @@ public class PainelAluno extends JPanel {
             }
         });
 
-        // Ações dos botões
         btnCadastrar.addActionListener(e -> cadastrarAluno());
         btnEditar.addActionListener(e -> editarAlunoSelecionado());
         btnExcluir.addActionListener(e -> excluirAlunoSelecionado());
@@ -109,7 +102,6 @@ public class PainelAluno extends JPanel {
                 return;
             }
 
-            // Validação de matrícula duplicada
             if (repo.getAlunos().stream().anyMatch(a -> a.getMatricula().equalsIgnoreCase(matricula))) {
                 JOptionPane.showMessageDialog(this, "A matrícula '" + matricula + "' já está em uso. Por favor, escolha outra.", "Matrícula Duplicada", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -132,7 +124,8 @@ public class PainelAluno extends JPanel {
         if (idx >= 0) {
             int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja excluir o aluno selecionado?", "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                repo.removerAluno(idx);
+                Aluno alunoParaExcluir = tableModel.getAlunoAt(idx);
+                repo.removerAluno(alunoParaExcluir.getMatricula());
                 ((AbstractTableModel) tableModel).fireTableDataChanged();
                 JOptionPane.showMessageDialog(this, "Aluno excluído com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -144,7 +137,7 @@ public class PainelAluno extends JPanel {
     private void editarAlunoSelecionado() {
         int idx = tabelaAlunos.getSelectedRow();
         if (idx >= 0) {
-            Aluno aluno = alunos.get(idx);
+            Aluno aluno = tableModel.getAlunoAt(idx);
             JTextField campoNome = new JTextField(aluno.getNome());
             JTextField campoMatricula = new JTextField(aluno.getMatricula());
             campoMatricula.setEditable(false);
@@ -174,8 +167,7 @@ public class PainelAluno extends JPanel {
                 }
                 aluno.setNome(nome);
                 aluno.setCurso(curso);
-                // tipo não editável diretamente pois depende da classe, mas pode ser ajustado se necessário
-                persistencia.ArquivoAluno.salvarAlunos(alunos); // salva lista atualizada sem duplicar
+                persistencia.ArquivoAluno.salvarAlunos(alunos);
                 ((AbstractTableModel) tableModel).fireTableDataChanged();
                 JOptionPane.showMessageDialog(this, "Aluno editado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -194,7 +186,6 @@ public class PainelAluno extends JPanel {
         return botao;
     }
 
-    // Modelo de tabela customizado para exibir Nome, Matrícula e Curso
     private static class AlunoTableModel extends AbstractTableModel {
         private final String[] colunas = {"Nome", "Matrícula", "Curso"};
         private final List<Aluno> alunos;
@@ -218,6 +209,10 @@ public class PainelAluno extends JPanel {
                 ).toList();
             }
             fireTableDataChanged();
+        }
+
+        public Aluno getAlunoAt(int rowIndex) {
+            return filtrados.get(rowIndex);
         }
 
         @Override
