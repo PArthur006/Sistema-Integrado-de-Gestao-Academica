@@ -2,12 +2,15 @@ package menus;
 
 import disciplina.Disciplina;
 import disciplina.Turma;
+import persistencia.AlunoRepository;
 import persistencia.ArquivoDisciplina;
+import aluno.Aluno;
 
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,12 +43,14 @@ public class PainelTurmas extends JPanel {
         JButton btnCadastrar = criarBotao("Cadastrar Turma", VERDE_1, Color.WHITE);
         JButton btnEditar = criarBotao("Editar Selecionada", AZUL_ESCURO_2, Color.WHITE);
         JButton btnExcluir = criarBotao("Excluir Selecionada", VERDE_2, Color.WHITE);
-        JButton btnMatricular = criarBotao("Matricular Aluno", AZUL_ESCURO_1, Color.WHITE);
+        JButton btnMatricular = criarBotao("Matricular Aluno", VERDE_1, Color.WHITE);
+        JButton btnVerAlunos = criarBotao("Ver Alunos", AZUL_ESCURO_1, Color.WHITE);
         JButton btnVoltar = criarBotao("Voltar", AZUL_ESCURO_2, Color.WHITE);
         navbar.add(btnCadastrar);
         navbar.add(btnEditar);
         navbar.add(btnExcluir);
         navbar.add(btnMatricular);
+        navbar.add(btnVerAlunos);
         navbar.add(btnVoltar);
         add(navbar, BorderLayout.NORTH);
 
@@ -64,6 +69,7 @@ public class PainelTurmas extends JPanel {
         btnEditar.addActionListener(e -> editarTurma());
         btnExcluir.addActionListener(e -> excluirTurma());
         btnMatricular.addActionListener(e -> matricularAluno());
+        btnVerAlunos.addActionListener(e -> verAlunosMatriculados());
         btnVoltar.addActionListener(e -> acaoVoltar.run());
     }
 
@@ -76,8 +82,108 @@ public class PainelTurmas extends JPanel {
 
         Turma turmaSelecionada = tableModel.getTurma(idx);
 
-        // A lógica de matrícula será implementada no próximo passo.
-        JOptionPane.showMessageDialog(this, "Funcionalidade para matricular alunos na turma " + turmaSelecionada.getCodigo() + " será implementada aqui.", "Em construção", JOptionPane.INFORMATION_MESSAGE);
+        if (turmaSelecionada.getAlunosMatriculados().size() >= turmaSelecionada.getCapacidade()) {
+            JOptionPane.showMessageDialog(this, "A turma está lotada.", "Turma Lotada", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        List<Aluno> todosAlunos = AlunoRepository.getInstance().getAlunos();
+        List<Aluno> alunosDisponiveis = todosAlunos.stream()
+                .filter(aluno -> turmaSelecionada.getAlunosMatriculados().stream()
+                        .noneMatch(matriculado -> matriculado.getMatricula().equals(aluno.getMatricula())))
+                .collect(Collectors.toList());
+
+        if (alunosDisponiveis.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Não há alunos disponíveis para matrícula.", "Informação", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        String[] opcoesAlunos = alunosDisponiveis.stream()
+                .map(a -> a.getNome() + " (" + a.getMatricula() + ")")
+                .toArray(String[]::new);
+
+        String alunoSelecionadoStr = (String) JOptionPane.showInputDialog(
+                this,
+                "Selecione o aluno para matricular:",
+                "Matricular Aluno na Turma " + turmaSelecionada.getCodigo(),
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                opcoesAlunos,
+                opcoesAlunos[0]
+        );
+
+        if (alunoSelecionadoStr == null) {
+            return; // Usuário cancelou
+        }
+
+        // Encontra o aluno correspondente na lista de disponíveis
+        int selectedIndex = java.util.Arrays.asList(opcoesAlunos).indexOf(alunoSelecionadoStr);
+        Aluno alunoParaMatricular = alunosDisponiveis.get(selectedIndex);
+
+        if (turmaSelecionada.matricularAluno(alunoParaMatricular)) {
+            salvarTurmasGlobal();
+            tableModel.fireTableDataChanged();
+            JOptionPane.showMessageDialog(this, "Aluno matriculado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Não foi possível matricular o aluno.\nVerifique se o aluno cumpre os pré-requisitos ou se a turma está lotada.", "Falha na Matrícula", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void verAlunosMatriculados() {
+        int idx = tabelaTurmas.getSelectedRow();
+        if (idx < 0) {
+            JOptionPane.showMessageDialog(this, "Selecione uma turma para ver os alunos.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Turma turma = tableModel.getTurma(idx);
+        List<Aluno> alunosMatriculados = turma.getAlunosMatriculados();
+
+        if (alunosMatriculados.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Não há alunos matriculados nesta turma.", "Informação", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // Cria um JDialog customizado para exibir os alunos
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Alunos da Turma " + turma.getCodigo(), true);
+        dialog.setSize(400, 300);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel painelLista = new JPanel();
+        painelLista.setLayout(new BoxLayout(painelLista, BoxLayout.Y_AXIS));
+
+        for (Aluno aluno : new ArrayList<>(alunosMatriculados)) {
+            JPanel linhaAluno = new JPanel(new BorderLayout(10, 0));
+            linhaAluno.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            linhaAluno.add(new JLabel(aluno.getNome() + " (" + aluno.getMatricula() + ")"), BorderLayout.CENTER);
+
+            JButton btnDesmatricular = new JButton("Desmatricular");
+            btnDesmatricular.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(dialog, "Desmatricular " + aluno.getNome() + "?", "Confirmar", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    turma.desmatricularAluno(aluno.getMatricula());
+                    salvarTurmasGlobal();
+                    tableModel.fireTableDataChanged(); // Atualiza a contagem de vagas na tabela principal
+
+                    // Remove a linha da interface do dialog
+                    painelLista.remove(linhaAluno);
+                    painelLista.revalidate();
+                    painelLista.repaint();
+                    JOptionPane.showMessageDialog(dialog, "Aluno desmatriculado.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                }
+            });
+            linhaAluno.add(btnDesmatricular, BorderLayout.EAST);
+            painelLista.add(linhaAluno);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(painelLista);
+        dialog.add(scrollPane, BorderLayout.CENTER);
+
+        JButton btnFechar = new JButton("Fechar");
+        btnFechar.addActionListener(e -> dialog.dispose());
+        dialog.add(btnFechar, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
     }
 
     private void cadastrarTurma() {
@@ -122,6 +228,14 @@ public class PainelTurmas extends JPanel {
                 JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+
+            // Validação de código duplicado
+            List<Turma> todasAsTurmas = ArquivoDisciplina.carregarTurmas();
+            if (todasAsTurmas.stream().anyMatch(t -> t.getCodigo().equalsIgnoreCase(codigo))) {
+                JOptionPane.showMessageDialog(this, "O código de turma '" + codigo + "' já existe. Por favor, escolha outro.", "Código Duplicado", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Turma nova = new Turma(codigo, disciplina, professor, semestre, sala, horario, capacidade, tipoAvaliacao);
             turmas.add(nova);
             salvarTurmasGlobal();

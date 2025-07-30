@@ -108,6 +108,13 @@ public class PainelAluno extends JPanel {
                 JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+
+            // Validação de matrícula duplicada
+            if (repo.getAlunos().stream().anyMatch(a -> a.getMatricula().equalsIgnoreCase(matricula))) {
+                JOptionPane.showMessageDialog(this, "A matrícula '" + matricula + "' já está em uso. Por favor, escolha outra.", "Matrícula Duplicada", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             aluno.Aluno novoAluno;
             if ("Normal".equals(tipo)) {
                 novoAluno = new aluno.AlunoNormal(nome, matricula, curso);

@@ -113,6 +113,13 @@ public class PainelDisciplina extends JPanel {
                 JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+
+            // Validação de código duplicado
+            if (disciplinas.stream().anyMatch(d -> d.getCodigo().equalsIgnoreCase(codigo))) {
+                JOptionPane.showMessageDialog(this, "O código de disciplina '" + codigo + "' já existe. Por favor, escolha outro.", "Código Duplicado", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Disciplina nova = new Disciplina(nome, codigo, carga);
             disciplinas.add(nova);
             ArquivoDisciplina.salvarDisciplinas(disciplinas);
@@ -171,15 +178,26 @@ public class PainelDisciplina extends JPanel {
     private void excluirDisciplina() {
         int idx = tabelaDisciplinas.getSelectedRow();
         if (idx >= 0) {
-            int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja excluir a disciplina selecionada?", "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja excluir a disciplina selecionada?\nTodas as turmas associadas também serão excluídas.", "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                Disciplina d = tableModel.getDisciplina(idx);
-                // Remove da lista principal
-                disciplinas.removeIf(disc -> disc.getCodigo().equals(d.getCodigo()));
+                Disciplina disciplinaParaExcluir = tableModel.getDisciplina(idx);
+                String codigoDisciplina = disciplinaParaExcluir.getCodigo();
+
+                // Exclusão em cascata: remove as turmas associadas
+                List<Turma> todasAsTurmas = ArquivoDisciplina.carregarTurmas();
+                List<Turma> turmasParaManter = todasAsTurmas.stream()
+                    .filter(t -> !t.getDisciplina().getCodigo().equals(codigoDisciplina))
+                    .collect(Collectors.toList());
+                ArquivoDisciplina.salvarTurmas(turmasParaManter);
+
+                // Remove a disciplina da lista principal
+                disciplinas.removeIf(disc -> disc.getCodigo().equals(codigoDisciplina));
+
+                // Atualiza a interface
                 tableModel.setFiltro(""); // Atualiza lista filtrada
                 ArquivoDisciplina.salvarDisciplinas(disciplinas);
                 tableModel.fireTableDataChanged();
-                JOptionPane.showMessageDialog(this, "Disciplina excluída com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Disciplina e suas turmas foram excluídas com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Selecione uma disciplina para excluir.", "Atenção", JOptionPane.WARNING_MESSAGE);
