@@ -50,16 +50,8 @@ public class MenuAvaliacao {
     }
 
     private static void lancarNotas(Scanner scanner, List<Turma> turmas) {
-        System.out.print("Código da turma: ");
-        String codigoTurma = scanner.nextLine();
-        
-        Turma turma = turmas.stream()
-            .filter(t -> t.getCodigo().equals(codigoTurma))
-            .findFirst()
-            .orElse(null);
-            
+        Turma turma = encontrarTurma(scanner, turmas);
         if (turma == null) {
-            System.out.println("Turma não encontrada!");
             return;
         }
         
@@ -106,16 +98,8 @@ public class MenuAvaliacao {
     }
 
     private static void lancarFrequencias(Scanner scanner, List<Turma> turmas) {
-        System.out.print("Código da turma: ");
-        String codigoTurma = scanner.nextLine();
-        
-        Turma turma = turmas.stream()
-            .filter(t -> t.getCodigo().equals(codigoTurma))
-            .findFirst()
-            .orElse(null);
-            
+        Turma turma = encontrarTurma(scanner, turmas);
         if (turma == null) {
-            System.out.println("Turma não encontrada!");
             return;
         }
         
@@ -186,5 +170,20 @@ public class MenuAvaliacao {
             String professor = scanner.nextLine();
             Relatorio.gerarPorProfessor(turmas, professor);
         }
+    }
+
+    private static Turma encontrarTurma(Scanner scanner, List<Turma> turmas) {
+        System.out.print("Código da turma: ");
+        String codigoTurma = scanner.nextLine();
+
+        Turma turma = turmas.stream()
+                .filter(t -> t.getCodigo().equals(codigoTurma))
+                .findFirst()
+                .orElse(null);
+
+        if (turma == null) {
+            System.out.println("Turma não encontrada!");
+        }
+        return turma;
     }
 }

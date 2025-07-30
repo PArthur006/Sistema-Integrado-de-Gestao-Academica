@@ -34,7 +34,6 @@ public class PainelAluno extends JPanel {
         // Navbar com botões visíveis
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         navbar.setBackground(AZUL_ESCURO_1);
-        navbar.setPreferredSize(new Dimension(600, 40));
         JButton btnCadastrar = criarBotao("Cadastrar Aluno", VERDE_1, Color.WHITE);
         JButton btnEditar = criarBotao("Editar Selecionado", AZUL_ESCURO_2, Color.WHITE);
         JButton btnExcluir = criarBotao("Excluir Selecionado", VERDE_2, Color.WHITE);
@@ -184,7 +183,7 @@ public class PainelAluno extends JPanel {
         botao.setForeground(corTexto);
         botao.setFocusPainted(false);
         botao.setFont(new Font("SansSerif", Font.BOLD, 16));
-        botao.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
+        botao.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         return botao;
     }
 

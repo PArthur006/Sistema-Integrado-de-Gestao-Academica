@@ -37,14 +37,15 @@ public class PainelTurmas extends JPanel {
         // Navbar
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         navbar.setBackground(AZUL_ESCURO_1);
-        navbar.setPreferredSize(new Dimension(600, 40));
         JButton btnCadastrar = criarBotao("Cadastrar Turma", VERDE_1, Color.WHITE);
         JButton btnEditar = criarBotao("Editar Selecionada", AZUL_ESCURO_2, Color.WHITE);
         JButton btnExcluir = criarBotao("Excluir Selecionada", VERDE_2, Color.WHITE);
+        JButton btnMatricular = criarBotao("Matricular Aluno", AZUL_ESCURO_1, Color.WHITE);
         JButton btnVoltar = criarBotao("Voltar", AZUL_ESCURO_2, Color.WHITE);
         navbar.add(btnCadastrar);
         navbar.add(btnEditar);
         navbar.add(btnExcluir);
+        navbar.add(btnMatricular);
         navbar.add(btnVoltar);
         add(navbar, BorderLayout.NORTH);
 
@@ -62,7 +63,21 @@ public class PainelTurmas extends JPanel {
         btnCadastrar.addActionListener(e -> cadastrarTurma());
         btnEditar.addActionListener(e -> editarTurma());
         btnExcluir.addActionListener(e -> excluirTurma());
+        btnMatricular.addActionListener(e -> matricularAluno());
         btnVoltar.addActionListener(e -> acaoVoltar.run());
+    }
+
+    private void matricularAluno() {
+        int idx = tabelaTurmas.getSelectedRow();
+        if (idx < 0) {
+            JOptionPane.showMessageDialog(this, "Selecione uma turma para matricular alunos.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Turma turmaSelecionada = tableModel.getTurma(idx);
+
+        // A lógica de matrícula será implementada no próximo passo.
+        JOptionPane.showMessageDialog(this, "Funcionalidade para matricular alunos na turma " + turmaSelecionada.getCodigo() + " será implementada aqui.", "Em construção", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void cadastrarTurma() {
@@ -202,13 +217,13 @@ public class PainelTurmas extends JPanel {
         botao.setForeground(corTexto);
         botao.setFocusPainted(false);
         botao.setFont(new Font("SansSerif", Font.BOLD, 16));
-        botao.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
+        botao.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         return botao;
     }
 
     // Modelo de tabela para turmas
     private static class TurmaTableModel extends AbstractTableModel {
-        private final String[] colunas = {"Código", "Professor", "Semestre", "Sala", "Horário", "Capacidade", "Tipo Avaliação"};
+        private final String[] colunas = {"Código", "Professor", "Semestre", "Vagas", "Horário"};
         private List<Turma> turmas;
         public TurmaTableModel(List<Turma> turmas) {
             this.turmas = turmas;
@@ -229,10 +244,8 @@ public class PainelTurmas extends JPanel {
                 case 0: return t.getCodigo();
                 case 1: return t.getProfessor();
                 case 2: return t.getSemestre();
-                case 3: return t.getSala();
+                case 3: return t.getAlunosMatriculados().size() + "/" + t.getCapacidade();
                 case 4: return t.getHorario();
-                case 5: return t.getCapacidade();
-                case 6: return t.getTipoAvaliacao();
                 default: return "";
             }
         }

@@ -15,7 +15,7 @@ public class TelaPrincipal extends JFrame {
     public TelaPrincipal() {
         setTitle("SIGA-FCTE - Tela Principal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
+        setSize(900, 600);
         setLocationRelativeTo(null);
         setContentPane(criarPainelPrincipal());
     }

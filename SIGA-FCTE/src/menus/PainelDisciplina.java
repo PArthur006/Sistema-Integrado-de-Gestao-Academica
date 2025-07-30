@@ -35,7 +35,6 @@ public class PainelDisciplina extends JPanel {
         // Navbar
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         navbar.setBackground(AZUL_ESCURO_1);
-        navbar.setPreferredSize(new Dimension(600, 40));
         JButton btnCadastrar = criarBotao("Cadastrar Disciplina", VERDE_1, Color.WHITE);
         JButton btnEditar = criarBotao("Editar Selecionada", AZUL_ESCURO_2, Color.WHITE);
         JButton btnExcluir = criarBotao("Excluir Selecionada", VERDE_2, Color.WHITE);
@@ -190,12 +189,18 @@ public class PainelDisciplina extends JPanel {
     private void gerenciarTurmas() {
         int idx = tabelaDisciplinas.getSelectedRow();
         if (idx >= 0) {
+            // Captura a referência do frame ANTES de qualquer troca de painel
+            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            if (frame == null) return; // Medida de segurança
+
             Disciplina d = tableModel.getDisciplina(idx);
             PainelTurmas painelTurmas = new PainelTurmas(d, () -> {
-                // Atualiza tabela ao voltar
+                // Usa a referência do frame capturada anteriormente
+                frame.setContentPane(this);
+                frame.revalidate();
+                frame.repaint();
                 tableModel.fireTableDataChanged();
             });
-            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
             frame.setContentPane(painelTurmas);
             frame.revalidate();
             frame.repaint();
@@ -210,7 +215,7 @@ public class PainelDisciplina extends JPanel {
         botao.setForeground(corTexto);
         botao.setFocusPainted(false);
         botao.setFont(new Font("SansSerif", Font.BOLD, 16));
-        botao.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 20));
+        botao.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         return botao;
     }
 
