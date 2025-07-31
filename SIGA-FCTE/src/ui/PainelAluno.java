@@ -4,18 +4,14 @@ package ui;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import java.awt.Frame;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 import persistencia.AlunoRepository;
 import aluno.Aluno;
 
 public class PainelAluno extends JPanel {
-    private static final Color AZUL_ESCURO_1 = Color.decode("#023373");
-    private static final Color AZUL_ESCURO_2 = Color.decode("#023E73");
-    private static final Color VERDE_1 = Color.decode("#02730A");
-    private static final Color VERDE_2 = Color.decode("#055902");
-    private static final Color BRANCO = Color.decode("#F2F2F2");
-
     private JTable tabelaAlunos;
     private AlunoTableModel tableModel;
     private List<Aluno> alunos;
@@ -25,25 +21,27 @@ public class PainelAluno extends JPanel {
     public PainelAluno(Runnable acaoVoltar) {
         this.acaoVoltar = acaoVoltar;
         setLayout(new BorderLayout());
-        setBackground(BRANCO);
+        setBackground(UIUtils.BRANCO);
 
         repo = AlunoRepository.getInstance();
         alunos = repo.getAlunos();
 
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        navbar.setBackground(AZUL_ESCURO_1);
-        JButton btnCadastrar = criarBotao("Cadastrar Aluno", VERDE_1, Color.WHITE);
-        JButton btnEditar = criarBotao("Editar Selecionado", AZUL_ESCURO_2, Color.WHITE);
-        JButton btnExcluir = criarBotao("Excluir Selecionado", VERDE_2, Color.WHITE);
-        JButton btnVoltar = criarBotao("Voltar", AZUL_ESCURO_2, Color.WHITE);
+        navbar.setBackground(UIUtils.AZUL_ESCURO_1);
+        JButton btnVoltar = UIUtils.criarBotao("⬅ Voltar", UIUtils.AZUL_ESCURO_2, Color.WHITE);
+        JButton btnCadastrar = UIUtils.criarBotao("➕ Cadastrar Aluno", UIUtils.VERDE_1, Color.WHITE);
+        JButton btnEditar = UIUtils.criarBotao("✎ Editar Selecionado", UIUtils.AZUL_ESCURO_2, Color.WHITE);
+        JButton btnTrancarSemestre = UIUtils.criarBotao("⛔ Trancar Semestre", UIUtils.VERDE_2, Color.WHITE);
+        JButton btnExcluir = UIUtils.criarBotao("❌ Excluir Selecionado", UIUtils.VERDE_2, Color.WHITE);
+        navbar.add(btnVoltar);
         navbar.add(btnCadastrar);
         navbar.add(btnEditar);
+        navbar.add(btnTrancarSemestre);
         navbar.add(btnExcluir);
-        navbar.add(btnVoltar);
         add(navbar, BorderLayout.NORTH);
 
         JPanel painelCentro = new JPanel(new BorderLayout());
-        painelCentro.setBackground(BRANCO);
+        painelCentro.setBackground(UIUtils.BRANCO);
         JTextField campoBusca = new JTextField();
         campoBusca.setFont(new Font("SansSerif", Font.PLAIN, 16));
         campoBusca.setToolTipText("Buscar por nome, matrícula ou curso");
@@ -70,6 +68,7 @@ public class PainelAluno extends JPanel {
 
         btnCadastrar.addActionListener(e -> cadastrarAluno());
         btnEditar.addActionListener(e -> editarAlunoSelecionado());
+        btnTrancarSemestre.addActionListener(e -> trancarSemestre());
         btnExcluir.addActionListener(e -> excluirAlunoSelecionado());
         btnVoltar.addActionListener(e -> acaoVoltar.run());
     }
@@ -81,22 +80,18 @@ public class PainelAluno extends JPanel {
         String[] tipos = {"Normal", "Especial"};
         JComboBox<String> comboTipo = new JComboBox<>(tipos);
 
-        JPanel painel = new JPanel(new GridLayout(0, 1));
-        painel.add(new JLabel("Nome:"));
-        painel.add(campoNome);
-        painel.add(new JLabel("Matrícula:"));
-        painel.add(campoMatricula);
-        painel.add(new JLabel("Curso:"));
-        painel.add(campoCurso);
-        painel.add(new JLabel("Tipo:"));
-        painel.add(comboTipo);
+        String[] labels = {"Nome:", "Matrícula:", "Curso:", "Tipo:"};
+        JComponent[] components = {campoNome, campoMatricula, campoCurso, comboTipo};
+        FormularioDialog dialog = new FormularioDialog((Frame) SwingUtilities.getWindowAncestor(this), "Cadastrar Aluno", labels, components);
+        dialog.setVisible(true);
 
-        int result = JOptionPane.showConfirmDialog(this, painel, "Cadastrar Aluno", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (result == JOptionPane.OK_OPTION) {
-            String nome = campoNome.getText().trim();
-            String matricula = campoMatricula.getText().trim();
-            String curso = campoCurso.getText().trim();
-            String tipo = (String) comboTipo.getSelectedItem();
+        Map<String, String> valores = dialog.getValores();
+
+        if (valores != null) {
+            String nome = valores.get("Nome:");
+            String matricula = valores.get("Matrícula:");
+            String curso = valores.get("Curso:");
+            String tipo = valores.get("Tipo:");
             if (nome.isEmpty() || matricula.isEmpty() || curso.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -119,6 +114,41 @@ public class PainelAluno extends JPanel {
         }
     }
 
+    private void trancarSemestre() {
+        int idx = tabelaAlunos.getSelectedRow();
+        if (idx < 0) {
+            JOptionPane.showMessageDialog(this, "Selecione um aluno para trancar o semestre.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Aluno aluno = tableModel.getAlunoAt(idx);
+        String semestreParaTrancar = JOptionPane.showInputDialog(this, "Digite o semestre que deseja trancar para " + aluno.getNome() + " (ex: 2024.1):", "Trancar Semestre", JOptionPane.QUESTION_MESSAGE);
+
+        if (semestreParaTrancar == null || semestreParaTrancar.trim().isEmpty()) {
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Tem certeza que deseja trancar o semestre " + semestreParaTrancar.trim() + " para o aluno " + aluno.getNome() + "?\n" +
+                "O aluno será desmatriculado de todas as turmas deste semestre.",
+                "Confirmar Trancamento de Semestre", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            List<Turma> todasAsTurmas = TurmaRepository.getInstance().getTurmas();
+            int turmasTrancadas = 0;
+
+            for (Turma turma : todasAsTurmas) {
+                if (turma.getSemestre().equalsIgnoreCase(semestreParaTrancar.trim())) {
+                    turma.desmatricularAluno(aluno.getMatricula());
+                    turmasTrancadas++;
+                }
+            }
+
+            ArquivoDisciplina.salvarTurmas(todasAsTurmas);
+            JOptionPane.showMessageDialog(this, "Semestre trancado com sucesso.\nO aluno foi removido de " + turmasTrancadas + " turma(s).", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
     private void excluirAlunoSelecionado() {
         int idx = tabelaAlunos.getSelectedRow();
         if (idx >= 0) {
@@ -138,6 +168,7 @@ public class PainelAluno extends JPanel {
         int idx = tabelaAlunos.getSelectedRow();
         if (idx >= 0) {
             Aluno aluno = tableModel.getAlunoAt(idx);
+
             JTextField campoNome = new JTextField(aluno.getNome());
             JTextField campoMatricula = new JTextField(aluno.getMatricula());
             campoMatricula.setEditable(false);
@@ -145,22 +176,18 @@ public class PainelAluno extends JPanel {
             String[] tipos = {"Normal", "Especial"};
             JComboBox<String> comboTipo = new JComboBox<>(tipos);
             comboTipo.setSelectedItem(aluno.getTipo());
+            comboTipo.setEnabled(false);
 
-            JPanel painel = new JPanel(new GridLayout(0, 1));
-            painel.add(new JLabel("Nome:"));
-            painel.add(campoNome);
-            painel.add(new JLabel("Matrícula:"));
-            painel.add(campoMatricula);
-            painel.add(new JLabel("Curso:"));
-            painel.add(campoCurso);
-            painel.add(new JLabel("Tipo:"));
-            painel.add(comboTipo);
+            String[] labels = {"Nome:", "Matrícula:", "Curso:", "Tipo:"};
+            JComponent[] components = {campoNome, campoMatricula, campoCurso, comboTipo};
+            FormularioDialog dialog = new FormularioDialog((Frame) SwingUtilities.getWindowAncestor(this), "Editar Aluno", labels, components);
+            dialog.setVisible(true);
 
-            int result = JOptionPane.showConfirmDialog(this, painel, "Editar Aluno", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            if (result == JOptionPane.OK_OPTION) {
-                String nome = campoNome.getText().trim();
-                String curso = campoCurso.getText().trim();
-                String tipo = (String) comboTipo.getSelectedItem();
+            Map<String, String> valores = dialog.getValores();
+
+            if (valores != null) {
+                String nome = valores.get("Nome:");
+                String curso = valores.get("Curso:");
                 if (nome.isEmpty() || curso.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -174,16 +201,6 @@ public class PainelAluno extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "Selecione um aluno para editar.", "Atenção", JOptionPane.WARNING_MESSAGE);
         }
-    }
-
-    private JButton criarBotao(String texto, Color corFundo, Color corTexto) {
-        JButton botao = new JButton(texto);
-        botao.setBackground(corFundo);
-        botao.setForeground(corTexto);
-        botao.setFocusPainted(false);
-        botao.setFont(new Font("SansSerif", Font.BOLD, 16));
-        botao.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        return botao;
     }
 
     private static class AlunoTableModel extends AbstractTableModel {

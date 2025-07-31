@@ -7,18 +7,14 @@ import aluno.Aluno;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.awt.Frame;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class PainelDisciplina extends JPanel {
-    private static final Color AZUL_ESCURO_1 = Color.decode("#023373");
-    private static final Color AZUL_ESCURO_2 = Color.decode("#023E73");
-    private static final Color VERDE_1 = Color.decode("#02730A");
-    private static final Color VERDE_2 = Color.decode("#055902");
-    private static final Color BRANCO = Color.decode("#F2F2F2");
-
     private List<Disciplina> disciplinas;
     private DisciplinaTableModel tableModel;
     private JTable tabelaDisciplinas;
@@ -28,22 +24,22 @@ public class PainelDisciplina extends JPanel {
     public PainelDisciplina(Runnable acaoVoltar) {
         this.acaoVoltar = acaoVoltar;
         setLayout(new BorderLayout());
-        setBackground(BRANCO);
+        setBackground(UIUtils.BRANCO);
 
         disciplinas = DisciplinaRepository.getInstance().getDisciplinas();
 
         JPanel navbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        navbar.setBackground(AZUL_ESCURO_1);
-        JButton btnCadastrar = criarBotao("Cadastrar Disciplina", VERDE_1, Color.WHITE);
-        JButton btnEditar = criarBotao("Editar Selecionada", AZUL_ESCURO_2, Color.WHITE);
-        JButton btnExcluir = criarBotao("Excluir Selecionada", VERDE_2, Color.WHITE);
-        JButton btnTurmas = criarBotao("Gerenciar Turmas", AZUL_ESCURO_1, Color.WHITE);
-        JButton btnVoltar = criarBotao("Voltar", AZUL_ESCURO_2, Color.WHITE);
+        navbar.setBackground(UIUtils.AZUL_ESCURO_1);
+        JButton btnVoltar = UIUtils.criarBotao("⬅ Voltar", UIUtils.AZUL_ESCURO_2, Color.WHITE);
+        JButton btnCadastrar = UIUtils.criarBotao("➕ Cadastrar Disciplina", UIUtils.VERDE_1, Color.WHITE);
+        JButton btnEditar = UIUtils.criarBotao("✎ Editar Selecionada", UIUtils.AZUL_ESCURO_2, Color.WHITE);
+        JButton btnExcluir = UIUtils.criarBotao("❌ Excluir Selecionada", UIUtils.VERDE_2, Color.WHITE);
+        JButton btnTurmas = UIUtils.criarBotao("📚 Gerenciar Turmas", UIUtils.AZUL_ESCURO_1, Color.WHITE);
+        navbar.add(btnVoltar);
         navbar.add(btnCadastrar);
         navbar.add(btnEditar);
         navbar.add(btnExcluir);
         navbar.add(btnTurmas);
-        navbar.add(btnVoltar);
         add(navbar, BorderLayout.NORTH);
 
         campoBusca = new JTextField();
@@ -51,7 +47,7 @@ public class PainelDisciplina extends JPanel {
         campoBusca.setToolTipText("Buscar por nome ou código");
 
         JPanel painelCentro = new JPanel(new BorderLayout());
-        painelCentro.setBackground(BRANCO);
+        painelCentro.setBackground(UIUtils.BRANCO);
         painelCentro.add(campoBusca, BorderLayout.NORTH);
 
         tableModel = new DisciplinaTableModel(disciplinas);
@@ -81,29 +77,28 @@ public class PainelDisciplina extends JPanel {
     }
 
     private void cadastrarDisciplina() {
-        JTextField campoNome = new JTextField();
-        JTextField campoCodigo = new JTextField();
-        JTextField campoCarga = new JTextField();
-        JPanel painel = new JPanel(new GridLayout(0, 1));
-        painel.add(new JLabel("Nome:"));
-        painel.add(campoNome);
-        painel.add(new JLabel("Código:"));
-        painel.add(campoCodigo);
-        painel.add(new JLabel("Carga Horária:"));
-        painel.add(campoCarga);
-        int result = JOptionPane.showConfirmDialog(this, painel, "Cadastrar Disciplina", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (result == JOptionPane.OK_OPTION) {
-            String nome = campoNome.getText().trim();
-            String codigo = campoCodigo.getText().trim();
-            int carga;
-            try {
-                carga = Integer.parseInt(campoCarga.getText().trim());
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Carga horária inválida!", "Erro", JOptionPane.ERROR_MESSAGE);
+        String[] labels = {"Nome:", "Código:", "Carga Horária:", "Pré-requisitos (códigos, sep. por vírgula):"};
+        FormularioDialog dialog = new FormularioDialog((Frame) SwingUtilities.getWindowAncestor(this), "Cadastrar Disciplina", labels);
+        dialog.setVisible(true);
+
+        Map<String, String> valores = dialog.getValores();
+
+        if (valores != null) {
+            String nome = valores.get("Nome:");
+            String codigo = valores.get("Código:");
+            String cargaStr = valores.get("Carga Horária:");
+            String preRequisitosStr = valores.get("Pré-requisitos (códigos, sep. por vírgula):");
+
+            if (nome.isEmpty() || codigo.isEmpty() || cargaStr.isEmpty()) { // Validação de pré-requisitos não é obrigatória
+                JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            if (nome.isEmpty() || codigo.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
+
+            int carga;
+            try {
+                carga = Integer.parseInt(cargaStr);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Carga horária inválida!", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -113,6 +108,12 @@ public class PainelDisciplina extends JPanel {
             }
 
             Disciplina nova = new Disciplina(nome, codigo, carga);
+            if (preRequisitosStr != null && !preRequisitosStr.isEmpty()) {
+                String[] preRequisitos = preRequisitosStr.split(",");
+                for (String preReq : preRequisitos) {
+                    nova.addPreRequisito(preReq.trim());
+                }
+            }
             disciplinas.add(nova);
             ArquivoDisciplina.salvarDisciplinas(disciplinas);
             tableModel.fireTableDataChanged();
@@ -124,35 +125,44 @@ public class PainelDisciplina extends JPanel {
         int idx = tabelaDisciplinas.getSelectedRow();
         if (idx >= 0) {
             Disciplina d = tableModel.getDisciplina(idx);
-            JTextField campoNome = new JTextField(d.getNome());
-            JTextField campoCodigo = new JTextField(d.getCodigo());
-            campoCodigo.setEditable(false);
-            JTextField campoCarga = new JTextField(String.valueOf(d.getCargaHoraria()));
-            JPanel painel = new JPanel(new GridLayout(0, 1));
-            painel.add(new JLabel("Nome:"));
-            painel.add(campoNome);
-            painel.add(new JLabel("Código:"));
-            painel.add(campoCodigo);
-            painel.add(new JLabel("Carga Horária:"));
-            painel.add(campoCarga);
-            int result = JOptionPane.showConfirmDialog(this, painel, "Editar Disciplina", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            if (result == JOptionPane.OK_OPTION) {
-                String nome = campoNome.getText().trim();
-                int carga;
-                try {
-                    carga = Integer.parseInt(campoCarga.getText().trim());
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(this, "Carga horária inválida!", "Erro", JOptionPane.ERROR_MESSAGE);
+            String preRequisitosStr = String.join(", ", d.getPreRequisitos());
+            String[] labels = {"Nome:", "Código:", "Carga Horária:", "Pré-requisitos (códigos, sep. por vírgula):"};
+            String[] valoresIniciais = {d.getNome(), d.getCodigo(), String.valueOf(d.getCargaHoraria()), preRequisitosStr};
+
+            FormularioDialog dialog = new FormularioDialog((Frame) SwingUtilities.getWindowAncestor(this), "Editar Disciplina", labels, valoresIniciais);
+            dialog.setCampoEditavel("Código:", false);
+            dialog.setVisible(true);
+
+            Map<String, String> valores = dialog.getValores();
+
+            if (valores != null) {
+                String nome = valores.get("Nome:");
+                String cargaStr = valores.get("Carga Horária:");
+                String novosPreRequisitosStr = valores.get("Pré-requisitos (códigos, sep. por vírgula):");
+
+                if (nome.isEmpty() || cargaStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-                if (nome.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Atenção", JOptionPane.WARNING_MESSAGE);
+
+                int carga;
+                try {
+                    carga = Integer.parseInt(cargaStr);
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Carga horária inválida!", "Erro", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 for (Disciplina disc : disciplinas) {
                     if (disc.getCodigo().equals(d.getCodigo())) {
                         disc.setNome(nome);
                         disc.setCargaHoraria(carga);
+                        // Atualiza os pré-requisitos
+                        disc.getPreRequisitos().clear();
+                        if (novosPreRequisitosStr != null && !novosPreRequisitosStr.isEmpty()) {
+                            for (String preReq : novosPreRequisitosStr.split(",")) {
+                                disc.addPreRequisito(preReq.trim());
+                            }
+                        }
                         break;
                     }
                 }
@@ -209,16 +219,6 @@ public class PainelDisciplina extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "Selecione uma disciplina para gerenciar turmas.", "Atenção", JOptionPane.WARNING_MESSAGE);
         }
-    }
-
-    private JButton criarBotao(String texto, Color corFundo, Color corTexto) {
-        JButton botao = new JButton(texto);
-        botao.setBackground(corFundo);
-        botao.setForeground(corTexto);
-        botao.setFocusPainted(false);
-        botao.setFont(new Font("SansSerif", Font.BOLD, 16));
-        botao.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        return botao;
     }
 
     private static class DisciplinaTableModel extends AbstractTableModel {

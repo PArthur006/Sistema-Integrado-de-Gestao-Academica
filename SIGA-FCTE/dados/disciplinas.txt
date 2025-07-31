@@ -1,4 +1,6 @@
-Matematica Discreta;MTM0112;60
-Orientação a Objetos;TEC2100;90
-Desenvolvimento de Software;TEC9877;90
-Guardiões da Saúde;SSA6544;30
+Cálculo 1;MA101;90
+Algoritmos e Estruturas de Dados;CS101;90
+Orientação a Objetos;CS201;60;CS101
+Redes de Computadores;EC301;60;CS101
+Banco de Dados;CS202;60;CS101
+Introdução à Álgebra Linear;MA102;60;MA101

@@ -16,35 +16,17 @@ public class Disciplina {
         this.preRequisitos = new ArrayList<>();
     }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getNome() { return nome; }
+    public String getCodigo() { return codigo; }
+    public int getCargaHoraria() { return cargaHoraria; }
+    public List<String> getPreRequisitos() { return preRequisitos; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
-    public int getCargaHoraria() {
-        return cargaHoraria;
-    }
-
-    public void setCargaHoraria(int cargaHoraria) {
-        this.cargaHoraria = cargaHoraria;
-    }
-
-    public List<String> getPreRequisitos() {
-        return preRequisitos;
-    }
+    public void setNome(String nome) { this.nome = nome; }
+    public void setCargaHoraria(int cargaHoraria) { this.cargaHoraria = cargaHoraria; }
 
     public void addPreRequisito(String codigoDisciplina) {
-        preRequisitos.add(codigoDisciplina);
+        if (codigoDisciplina != null && !codigoDisciplina.trim().isEmpty() && !preRequisitos.contains(codigoDisciplina)) {
+            preRequisitos.add(codigoDisciplina);
+        }
     }
 }

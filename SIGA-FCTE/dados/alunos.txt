@@ -1,5 +1,5 @@
-Pedro Arthur Rodrigues;241012365;Engenharias;Normal
-Marcelly Clelia;252210365;Letras-Espanhol;Normal
-Maria Júlia;361012365;Fisioterapia;Normal
-Matheus Freire;123456789;Veterinaria;Normal
-João Guilherme;254101258;Engenharia de Energia;Normal
+Ana Silva;23101;Engenharia de Software;Normal;CS101
+Bruno Costa;23102;Ciência da Computação;Normal;CS101,MA101
+Carla Dias;23103;Engenharia de Redes;Especial;
+Daniel Souza;23104;Ciência da Computação;Normal;
+Elisa Ferreira;23105;Engenharia de Software;Especial;

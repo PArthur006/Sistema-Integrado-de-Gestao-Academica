@@ -1,3 +1,3 @@
-# Arquivo de frequências
-# Formato sugerido: turma;aluno;faltas
-
+T01;23101;10
+T01;23102;2
+T03;23104;25

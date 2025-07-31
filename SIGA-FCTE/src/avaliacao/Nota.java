@@ -5,16 +5,10 @@ public class Nota {
     private String aluno;
     private double[] notas;
 
-    // Construtor para persistência
     public Nota(String turma, String aluno, double[] notas) {
         this.turma = turma;
         this.aluno = aluno;
         this.notas = notas;
-    }
-
-    // Construtor antigo para uso interno (mantido para compatibilidade)
-    public Nota(double p1, double p2, double p3, double l, double s) {
-        this.notas = new double[]{p1, p2, p3, l, s};
     }
 
     public String getTurma() {

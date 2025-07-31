@@ -27,6 +27,16 @@ O sistema permite o controle completo de alunos, disciplinas, turmas e avaliaç�
 -   **Persistência de Dados:**
     -   Todas as informações são salvas em arquivos de texto no diretório `dados/`, garantindo que os dados não sejam perdidos ao fechar o sistema.
 
+## 🏛️ Arquitetura
+
+O projeto segue o princípio da **Separação de Responsabilidades**, dividindo o código em camadas bem definidas:
+
+-   **`ui` (Interface do Usuário):** Contém todas as classes Swing responsáveis pela apresentação visual e interação com o usuário.
+-   **`persistencia` (Camada de Acesso a Dados):** Responsável por ler e escrever os dados do modelo em arquivos de texto. Isola a lógica de armazenamento do resto da aplicação.
+-   **`aluno`, `disciplina`, `avaliacao` (Camada de Modelo):** Contém as classes que representam as entidades e as regras de negócio do sistema (ex: `Aluno`, `Turma`, `Boletim`).
+
+Essa estrutura torna o código mais organizado, coeso e fácil de manter.
+
 ## 🚀 Como Executar
 
 ### Pré-requisitos
@@ -55,8 +65,13 @@ O sistema permite o controle completo de alunos, disciplinas, turmas e avaliaç�
 
 3.  **Execute a aplicação:**
     Após a compilação, execute a classe principal a partir da raiz do projeto:
+    *No Linux ou macOS:*
     ```bash
-    java -cp SIGA-FCTE/bin ui.TelaPrincipal
+    java -Dsun.java2d.xrender=false -cp SIGA-FCTE/bin Main
+    ```
+    *No Windows (PowerShell):*
+    ```bash
+    java -Dsun.java2d.xrender=false -cp SIGA-FCTE/bin Main
     ```
 
 A janela principal do sistema deverá ser exibida.

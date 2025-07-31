@@ -6,11 +6,13 @@ import java.io.*;
 import java.util.*;
 
 public class ArquivoAvaliacao {
-    private static final String ARQ_AVALIACOES = "SIGA-FCTE/dados/avaliacoes.txt";
-    private static final String ARQ_FREQUENCIAS = "SIGA-FCTE/dados/frequencias.txt";
+    private static final String DIRETORIO_DADOS = "SIGA-FCTE/dados";
+    private static final String ARQ_AVALIACOES = DIRETORIO_DADOS + "/avaliacoes.txt";
+    private static final String ARQ_FREQUENCIAS = DIRETORIO_DADOS + "/frequencias.txt";
 
     public static List<Nota> lerAvaliacoes() {
         List<Nota> avaliacoes = new ArrayList<>();
+        new File(DIRETORIO_DADOS).mkdir();
         try (BufferedReader br = new BufferedReader(new FileReader(ARQ_AVALIACOES))) {
             String linha;
             while ((linha = br.readLine()) != null) {
@@ -23,21 +25,28 @@ public class ArquivoAvaliacao {
                 double[] notas = Arrays.stream(notasStr).mapToDouble(Double::parseDouble).toArray();
                 avaliacoes.add(new Nota(turma, aluno, notas));
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o arquivo de avaliações: " + e.getMessage());
+        }
         return avaliacoes;
     }
 
     public static void salvarAvaliacoes(List<Nota> novasAvaliacoes) {
-        List<Nota> antigas = lerAvaliacoes();
-        for (Nota nova : novasAvaliacoes) {
-            boolean existe = antigas.stream().anyMatch(a -> a.getTurma().equals(nova.getTurma()) && a.getAluno().equals(nova.getAluno()));
-            if (!existe) {
-                antigas.add(nova);
-            }
+        List<Nota> registrosAtuais = lerAvaliacoes();
+        Map<String, Nota> mapaRegistros = new LinkedHashMap<>();
+        for (Nota n : registrosAtuais) {
+            mapaRegistros.put(n.getTurma() + ";" + n.getAluno(), n);
         }
+        for (Nota n : novasAvaliacoes) {
+            mapaRegistros.put(n.getTurma() + ";" + n.getAluno(), n);
+        }
+        List<Nota> listaFinal = new ArrayList<>(mapaRegistros.values());
+
+        new File(DIRETORIO_DADOS).mkdir();
         try (PrintWriter pw = new PrintWriter(new FileWriter(ARQ_AVALIACOES))) {
             pw.println("# turma;aluno;nota1,nota2,...");
-            for (Nota n : antigas) {
+            for (Nota n : listaFinal) {
                 pw.print(n.getTurma() + ";" + n.getAluno() + ";");
                 double[] notas = n.getNotas();
                 for (int i = 0; i < notas.length; i++) {
@@ -46,11 +55,14 @@ public class ArquivoAvaliacao {
                 }
                 pw.println();
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o arquivo de avaliações: " + e.getMessage());
+        }
     }
 
     public static List<Frequencia> lerFrequencias() {
         List<Frequencia> frequencias = new ArrayList<>();
+        new File(DIRETORIO_DADOS).mkdir();
         try (BufferedReader br = new BufferedReader(new FileReader(ARQ_FREQUENCIAS))) {
             String linha;
             while ((linha = br.readLine()) != null) {
@@ -62,23 +74,32 @@ public class ArquivoAvaliacao {
                 int faltas = Integer.parseInt(partes[2]);
                 frequencias.add(new Frequencia(turma, aluno, faltas));
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+            System.out.println("Erro ao ler o arquivo de frequências: " + e.getMessage());
+        }
         return frequencias;
     }
 
     public static void salvarFrequencias(List<Frequencia> novasFrequencias) {
-        List<Frequencia> antigas = lerFrequencias();
-        for (Frequencia nova : novasFrequencias) {
-            boolean existe = antigas.stream().anyMatch(f -> f.getTurma().equals(nova.getTurma()) && f.getAluno().equals(nova.getAluno()));
-            if (!existe) {
-                antigas.add(nova);
-            }
+        List<Frequencia> registrosAtuais = lerFrequencias();
+        Map<String, Frequencia> mapaRegistros = new LinkedHashMap<>();
+        for (Frequencia f : registrosAtuais) {
+            mapaRegistros.put(f.getTurma() + ";" + f.getAluno(), f);
         }
+        for (Frequencia f : novasFrequencias) {
+            mapaRegistros.put(f.getTurma() + ";" + f.getAluno(), f);
+        }
+        List<Frequencia> listaFinal = new ArrayList<>(mapaRegistros.values());
+
+        new File(DIRETORIO_DADOS).mkdir();
         try (PrintWriter pw = new PrintWriter(new FileWriter(ARQ_FREQUENCIAS))) {
             pw.println("# turma;aluno;faltas");
-            for (Frequencia f : antigas) {
+            for (Frequencia f : listaFinal) {
                 pw.println(f.getTurma() + ";" + f.getAluno() + ";" + f.getFaltas());
             }
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar o arquivo de frequências: " + e.getMessage());
+        }
     }
 }

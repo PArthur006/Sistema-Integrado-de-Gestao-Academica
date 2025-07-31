@@ -1,7 +1,6 @@
 package disciplina;
 
 import aluno.Aluno;
-import avaliacao.Avaliacao;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,10 +13,10 @@ public class Turma {
     private String horario;
     private int capacidade;
     private String tipoAvaliacao;
+    private String modalidade;
     private List<Aluno> alunosMatriculados;
-    private Avaliacao avaliacao;
 
-    public Turma(String codigo, Disciplina disciplina, String professor, String semestre, String sala, String horario, int capacidade, String tipoAvaliacao) {
+    public Turma(String codigo, Disciplina disciplina, String professor, String semestre, String sala, String horario, int capacidade, String tipoAvaliacao, String modalidade) {
         this.codigo = codigo;
         this.disciplina = disciplina;
         this.professor = professor;
@@ -26,92 +25,40 @@ public class Turma {
         this.horario = horario;
         this.capacidade = capacidade;
         this.tipoAvaliacao = tipoAvaliacao;
+        this.modalidade = modalidade;
         this.alunosMatriculados = new ArrayList<>();
     }
 
+    public String getCodigo() { return codigo; }
+    public Disciplina getDisciplina() { return disciplina; }
+    public String getProfessor() { return professor; }
+    public String getSemestre() { return semestre; }
+    public String getSala() { return sala; }
+    public String getHorario() { return horario; }
+    public int getCapacidade() { return capacidade; }
+    public String getTipoAvaliacao() { return tipoAvaliacao; }
+    public String getModalidade() { return modalidade; }
+    public List<Aluno> getAlunosMatriculados() { return alunosMatriculados; }
+
+    public void setProfessor(String professor) { this.professor = professor; }
+    public void setSemestre(String semestre) { this.semestre = semestre; }
+    public void setSala(String sala) { this.sala = sala; }
+    public void setHorario(String horario) { this.horario = horario; }
+    public void setCapacidade(int capacidade) { this.capacidade = capacidade; }
+    public void setTipoAvaliacao(String tipoAvaliacao) { this.tipoAvaliacao = tipoAvaliacao; }
+    public void setModalidade(String modalidade) { this.modalidade = modalidade; }
+
     public boolean matricularAluno(Aluno aluno) {
-        if (alunosMatriculados.stream().anyMatch(a -> a.getMatricula().equals(aluno.getMatricula()))) {
-            return false;
-        }
-        
-        if (alunosMatriculados.size() < capacidade && aluno.podeMatricular(disciplina)) {
-            alunosMatriculados.add(aluno);
-            aluno.getDisciplinasMatriculadas().add(disciplina);
-            return true;
+        if (alunosMatriculados.size() < capacidade) {
+            if (alunosMatriculados.stream().noneMatch(a -> a.getMatricula().equals(aluno.getMatricula()))) {
+                alunosMatriculados.add(aluno);
+                return true;
+            }
         }
         return false;
     }
 
     public void desmatricularAluno(String matricula) {
-        alunosMatriculados.stream().filter(a -> a.getMatricula().equals(matricula)).findFirst().ifPresent(aluno -> aluno.getDisciplinasMatriculadas().remove(this.disciplina));
         alunosMatriculados.removeIf(aluno -> aluno.getMatricula().equals(matricula));
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public Disciplina getDisciplina() {
-        return disciplina;
-    }
-
-    public String getProfessor() {
-        return professor;
-    }
-
-    public String getSemestre() {
-        return semestre;
-    }
-
-    public String getSala() {
-        return sala;
-    }
-
-    public String getHorario() {
-        return horario;
-    }
-
-    public int getCapacidade() {
-        return capacidade;
-    }
-
-    public String getTipoAvaliacao() {
-        return tipoAvaliacao;
-    }
-
-    public List<Aluno> getAlunosMatriculados() {
-        return alunosMatriculados;
-    }
-
-    public Avaliacao getAvaliacao() {
-        return avaliacao;
-    }
-
-    public void setAvaliacao(Avaliacao avaliacao) {
-        this.avaliacao = avaliacao;
-    }
-
-    public void setProfessor(String professor) {
-        this.professor = professor;
-    }
-
-    public void setSala(String sala) {
-        this.sala = sala;
-    }
-
-    public void setHorario(String horario) {
-        this.horario = horario;
-    }
-
-    public void setCapacidade(int capacidade) {
-        this.capacidade = capacidade;
-    }
-
-    public void setSemestre(String semestre) {
-        this.semestre = semestre;
-    }
-
-    public void setTipoAvaliacao(String tipoAvaliacao) {
-        this.tipoAvaliacao = tipoAvaliacao;
     }
 }

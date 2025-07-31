@@ -1,1 +1,4 @@
-MTM0112-6;MTM0112;Cristiane;1;S9;24M34;90;Padrão;252210365;241012365
+T01;CS201;Dr. Boaventura;2024.1;A1-01;Seg/Qua 10h-12h;30;Ponderada;Presencial;23101;23102
+T02;EC301;Dra. Carla;2024.1;N/A;Ter/Qui 14h-16h;25;Simples;Remota;23103
+T03;MA101;Dr. Marcos;2024.1;B2-05;Seg/Qua 08h-10h;40;Simples;Presencial;23104;23102;23105
+T04;CS202;Dr. Boaventura;2024.2;A1-02;Ter/Qui 10h-12h;30;Ponderada;Presencial;23102
