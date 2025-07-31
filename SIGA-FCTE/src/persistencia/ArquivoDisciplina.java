@@ -7,12 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import aluno.Aluno;
 
+/**
+ * Classe responsável pela persistência dos dados de Disciplinas e Turmas.
+ */
 public class ArquivoDisciplina {
     private static final String DIRETORIO_DADOS = "SIGA-FCTE/dados";
     private static final String ARQUIVO_DISCIPLINAS = DIRETORIO_DADOS + "/disciplinas.txt";
     private static final String ARQUIVO_TURMAS = DIRETORIO_DADOS + "/turmas.txt";
 
     public static List<Disciplina> carregarDisciplinas() {
+        /**
+         * Carrega a lista de disciplinas do arquivo disciplinas.txt.
+         */
         List<Disciplina> disciplinas = new ArrayList<>();
         new File(DIRETORIO_DADOS).mkdir();
         try (BufferedReader br = new BufferedReader(new FileReader(ARQUIVO_DISCIPLINAS))) {
@@ -35,6 +41,9 @@ public class ArquivoDisciplina {
     }
 
     public static List<Turma> carregarTurmas() {
+        /**
+         * Carrega a lista de turmas do arquivo turmas.txt, vinculando disciplinas e alunos.
+         */
         List<Turma> turmas = new ArrayList<>();
         List<Disciplina> disciplinas = carregarDisciplinas();
         List<Aluno> alunos = new ArrayList<>();
@@ -83,6 +92,9 @@ public class ArquivoDisciplina {
     }
 
     public static void salvarDisciplinas(List<Disciplina> disciplinas) {
+        /**
+         * Salva a lista de disciplinas no arquivo disciplinas.txt, sobrescrevendo o conteúdo.
+         */
         new File(DIRETORIO_DADOS).mkdir();
         
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARQUIVO_DISCIPLINAS))) {
@@ -103,6 +115,9 @@ public class ArquivoDisciplina {
     }
 
     public static void salvarTurmas(List<Turma> turmas) {
+        /**
+         * Salva a lista de turmas no arquivo turmas.txt, sobrescrevendo o conteúdo.
+         */
         new File(DIRETORIO_DADOS).mkdir();
         
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARQUIVO_TURMAS))) {

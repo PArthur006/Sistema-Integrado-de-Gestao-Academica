@@ -1,16 +1,25 @@
 package avaliacao;
 
+/**
+ * Representa o conjunto de notas de um aluno em uma turma.
+ */
 public class Nota {
     private String turma;
     private String aluno;
     private double[] notas;
 
     public Nota(String turma, String aluno, double[] notas) {
+        /**
+         * Construtor
+         */
         this.turma = turma;
         this.aluno = aluno;
         this.notas = notas;
     }
 
+    /**
+     * Getters
+     */
     public String getTurma() {
         return turma;
     }

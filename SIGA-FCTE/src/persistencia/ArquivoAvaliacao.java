@@ -5,12 +5,18 @@ import avaliacao.Frequencia;
 import java.io.*;
 import java.util.*;
 
+/**
+ * Classe responsável pela persistência dos dados de Avaliações (Notas e Frequências).
+ */
 public class ArquivoAvaliacao {
     private static final String DIRETORIO_DADOS = "SIGA-FCTE/dados";
     private static final String ARQ_AVALIACOES = DIRETORIO_DADOS + "/avaliacoes.txt";
     private static final String ARQ_FREQUENCIAS = DIRETORIO_DADOS + "/frequencias.txt";
 
     public static List<Nota> lerAvaliacoes() {
+        /**
+         * Carrega a lista de notas do arquivo avaliacoes.txt.
+         */
         List<Nota> avaliacoes = new ArrayList<>();
         new File(DIRETORIO_DADOS).mkdir();
         try (BufferedReader br = new BufferedReader(new FileReader(ARQ_AVALIACOES))) {
@@ -33,6 +39,9 @@ public class ArquivoAvaliacao {
     }
 
     public static void salvarAvaliacoes(List<Nota> novasAvaliacoes) {
+        /**
+         * Salva a lista de notas, mesclando com os registros existentes para permitir atualizações.
+         */
         List<Nota> registrosAtuais = lerAvaliacoes();
         Map<String, Nota> mapaRegistros = new LinkedHashMap<>();
         for (Nota n : registrosAtuais) {
@@ -61,6 +70,9 @@ public class ArquivoAvaliacao {
     }
 
     public static List<Frequencia> lerFrequencias() {
+        /**
+         * Carrega a lista de frequências do arquivo frequencias.txt.
+         */
         List<Frequencia> frequencias = new ArrayList<>();
         new File(DIRETORIO_DADOS).mkdir();
         try (BufferedReader br = new BufferedReader(new FileReader(ARQ_FREQUENCIAS))) {
@@ -82,6 +94,9 @@ public class ArquivoAvaliacao {
     }
 
     public static void salvarFrequencias(List<Frequencia> novasFrequencias) {
+        /**
+         * Salva a lista de frequências, mesclando com os registros existentes.
+         */
         List<Frequencia> registrosAtuais = lerFrequencias();
         Map<String, Frequencia> mapaRegistros = new LinkedHashMap<>();
         for (Frequencia f : registrosAtuais) {

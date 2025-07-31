@@ -2,8 +2,14 @@ package avaliacao;
 
 import disciplina.Turma;
 
+/**
+ * Representa o boletim de um aluno em uma turma, calculando média, frequência e situação.
+ */
 public class Boletim {
 
+    /**
+     * Enum para representar a situação final do aluno na disciplina.
+     */
     public enum Situacao {
         APROVADO("Aprovado"),
         REPROVADO_POR_NOTA("Reprovado por Nota"),
@@ -26,6 +32,9 @@ public class Boletim {
     private double percentualFrequencia;
 
     public Boletim(Turma turma, String matricula, java.util.List<Nota> notas, java.util.List<Frequencia> frequencias) {
+        /**
+         * Construtor que busca os dados de nota e frequência e calcula os resultados.
+         */
         this.turma = turma;
         this.matricula = matricula;
         this.nota = notas.stream().filter(n -> n.getTurma().equals(turma.getCodigo()) && n.getAluno().equals(matricula)).findFirst().orElse(null);
@@ -35,6 +44,9 @@ public class Boletim {
     }
 
     public double calcularMedia() {
+        /**
+         * Calcula a média final do aluno com base no tipo de avaliação da turma.
+         */
         if (nota == null) {
             return 0.0;
         }
@@ -47,6 +59,9 @@ public class Boletim {
     }
 
     public double calcularPercentualFrequencia() {
+        /**
+         * Calcula o percentual de frequência do aluno.
+         */
         if (frequencia == null || turma.getDisciplina().getCargaHoraria() <= 0) {
             return 100.0;
         }
@@ -54,12 +69,18 @@ public class Boletim {
         return 100.0 - (frequencia.getFaltas() * 100.0 / cargaHoraria);
     }
 
+    /**
+     * @deprecated Use getSituacao() para obter um status detalhado.
+     */
     @Deprecated
     public boolean isAprovado() {
         return getSituacao() == Situacao.APROVADO;
     }
 
     public Situacao getSituacao() {
+        /**
+         * Retorna a situação detalhada do aluno (aprovado, reprovado por nota, etc.).
+         */
         if (nota == null || frequencia == null) {
             return Situacao.DADOS_INCOMPLETOS;
         }
@@ -73,6 +94,9 @@ public class Boletim {
         return Situacao.REPROVADO_POR_FALTA;
     }
 
+    /**
+     * Getters
+     */
     public double getMediaFinal() {
         return mediaFinal;
     }

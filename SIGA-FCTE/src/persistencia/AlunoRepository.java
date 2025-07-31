@@ -5,6 +5,9 @@ import disciplina.Turma;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Repositório Singleton para gerenciar a lista de alunos em memória.
+ */
 public class AlunoRepository {
     private static AlunoRepository instance;
     private List<Aluno> alunos;
@@ -36,7 +39,7 @@ public class AlunoRepository {
             turma.desmatricularAluno(matricula);
         }
 
-        // Agora, remove o aluno do repositório principal.
+        // Remove o aluno do repositório principal.
         alunos.removeIf(aluno -> aluno.getMatricula().equals(matricula));
 
         // Salva as alterações nos dois arquivos para manter a consistência.
